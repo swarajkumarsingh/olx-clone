@@ -6,14 +6,17 @@ services:
     container_name: redis_container
     ports:
       - 6379:6379
+    restart: on-failure
     volumes:
       - .cache:/data
     
   golang:
     container_name: golang_container
-    build: .
+    build:
+      dockerfile: Dockerfile.local
     ports:
       - 8080:8080
+    # For Local
     volumes:
       - ./:/app
     restart: on-failure
