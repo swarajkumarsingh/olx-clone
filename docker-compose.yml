@@ -9,19 +9,47 @@ services:
     restart: on-failure
     volumes:
       - .cache:/data
+
+  postgres:
+    build: ./postgres/.
+    container_name: postgres_container
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    hostname: localhost
     
   golang:
     container_name: golang_container
     build:
       dockerfile: Dockerfile.local
+    environment:
+      - STAGE=${STAGE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - DD_AGENT_HOST=${DD_AGENT_HOST}
+      - S3_BUCKET=${S3_BUCKET}
     ports:
       - 8080:8080
-    # For Local
-    volumes:
-      - ./:/app
     restart: on-failure
     depends_on:
       - redis
+      - postgres
+    # For Dockerfile.Local only
+    volumes:
+      - ./:/app
 
 volumes:
   redis: {}
+  db:
+    driver: local

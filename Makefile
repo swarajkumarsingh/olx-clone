@@ -1,8 +1,9 @@
 run:
-	docker build -t olx-clone . && docker run -p 8080:8080 olx-clone
+	docker compose build
+	docker compose up
 
 build:
-	docker build -t olx-clone
+	docker build -t olx-clone . && docker run -p 8080:8080 olx-clone
 
 start:
 	docker run -p 8080:8080 olx-clone

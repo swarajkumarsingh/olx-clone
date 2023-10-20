@@ -17,7 +17,7 @@ const (
 	ENV_LOCAL = constants.ENV_LOCAL
 )
 
-var ClientENV = ""
+var ClientENV = "client"
 const REGION = "ap-south-1"
 
 const DDServiceName = "go-deployable-kyc"
