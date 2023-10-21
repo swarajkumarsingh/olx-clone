@@ -62,8 +62,7 @@ func GetUsers(ctx *gin.Context) {
 	offset := (page - 1) * itemsPerPage
 	rows, err := database.Query(`SELECT id, name, email, number FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
-		return
+		logger.WithRequest(ctx).Panicln("Failed to retrieve users")
 	}
 	defer rows.Close()
 
@@ -72,8 +71,7 @@ func GetUsers(ctx *gin.Context) {
 		var id int
 		var username, email, number string
 		if err := rows.Scan(&id, &username, &email, &number); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan user data"})
-			return
+			logger.WithRequest(ctx).Panicln("Failed to scan user data")
 		}
 		users = append(users, gin.H{"id": id, "username": username, "email": email, "number": number})
 	}
