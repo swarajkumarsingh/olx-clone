@@ -21,8 +21,8 @@ var log = logger.Log
 func MigrateDB() {
 	database := db.Mgr.DBConn
 
+	// DROP TABLE IF EXISTS "user";
 	_, err := database.Exec(`
-		DROP TABLE IF EXISTS "user";
 
 		CREATE TABLE IF NOT EXISTS "user" (
 			id SERIAL NOT NULL PRIMARY KEY,

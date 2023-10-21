@@ -1,0 +1,15 @@
+### Healt Check
+GET http://localhost:8080
+
+### Redirect Url
+GET http://localhost:8080/AAAAAAB
+
+### Create Short Url
+POST http://localhost:8080/create-user
+
+{
+    "name": "sima",
+    "email": "sswaraj169@gmail.com",
+    "password": "password",
+    "number": "1234567890"
+}

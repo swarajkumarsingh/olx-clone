@@ -1,6 +1,7 @@
 package user
 
 import (
+	"net/http"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
@@ -18,35 +19,59 @@ type UserBody struct {
 	Created_on string `json:"created_on"`
 }
 
-// create user
 func CreateUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, 500)
 
-	// get body data
 	var body UserBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	// hash password
-	
-
-	// store in DB
-	database := db.Mgr.DBConn
-	query := `INSERT INTO "user"(name, email, password, number) VALUES($1, $2, $3, $4)`
-	result, err := database.Exec(query, body.Name, body.Email, body.Password, body.Number)
+	hashedPassword, err := HashPassword(body.Password)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
-	logger.Log.Println(result.LastInsertId())
-	logger.Log.Println(result.RowsAffected())
 
-	// generate JWT token
+	if err = InsertUser(ctx, body, hashedPassword); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	tokenString, err := GenerateJwtToken(body.Name)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
 
 	ctx.JSON(200, gin.H{
 		"error":   false,
 		"message": "User Created successfully",
+		"token":   tokenString,
 	})
+}
+
+// get user
+func GetUsers(ctx *gin.Context) {
+	errorHandler.Recovery(ctx, http.StatusInternalServerError)
+
+	// check if user is admin only then proceed
+
+	database := db.Mgr.DBConn
+	rows, err := database.Query(`SELECT id, name, email FROM "user"`)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+	defer rows.Close()
+
+	// Iterate through the rows and build a slice of user data.
+	var users []gin.H
+	for rows.Next() {
+		var id int
+		var username, email string
+		if err := rows.Scan(&id, &username, &email); err != nil {
+			logger.WithRequest(ctx).Panicln(err)
+		}
+		users = append(users, gin.H{"id": id, "username": username, "email": email})
+	}
+	ctx.JSON(http.StatusOK, users)
 }
 
 // get user
