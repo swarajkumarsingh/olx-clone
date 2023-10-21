@@ -5,6 +5,7 @@ import (
 
 	"olx-clone/functions/logger"
 	"olx-clone/migrations"
+	routes "olx-clone/routes/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,6 +43,8 @@ func main() {
 			"message": "health ok",
 		})
 	})
+
+	routes.AddUserRoutes(r)
 
 	log.Printf("Server Started, version: %s", version)
 	http.ListenAndServe(":8080", r)

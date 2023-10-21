@@ -18,6 +18,28 @@ import (
 
 var log = logger.Log
 
+func MigrateDB() {
+	database := db.Mgr.DBConn
+
+	_, err := database.Exec(`
+		DROP TABLE IF EXISTS "user";
+
+		CREATE TABLE IF NOT EXISTS "user" (
+			id SERIAL NOT NULL PRIMARY KEY,
+			name VARCHAR(100) NOT NULL,
+			email VARCHAR(50) NOT NULL,
+			password VARCHAR(200) NOT NULL,
+			number VARCHAR(10) NOT NULL,
+			avatar TEXT,
+			address TEXT,
+			created_at DATE
+		);
+	`)
+	if err != nil {
+		logger.Log.Panicln("Error while migration: ", err)
+	}
+}
+
 var fileNameRegex *regexp.Regexp = regexp.MustCompile(`scripts/\d{20}_\S+.sql`)
 
 // checks if sql file name is in correct format
@@ -54,46 +76,6 @@ func writeMetadata(scriptName string) bool {
 		return false
 	}
 	return true
-}
-
-// MigrateDB finds the last run migration, and run all those after it in order
-func MigrateDB() {
-
-	database := db.Mgr.DBConn
-	
-	// Create a migration table if it doesn't exist.
-	_, err := database.Exec(`
-		CREATE TABLE IF NOT EXISTS migrations (
-			id serial PRIMARY KEY,
-			version INT,
-			description TEXT
-		);
-	`)
-
-	if err != nil {
-		log.Errorln("Error while pinging the DB", err)
-		panic(err)
-	}
-
-	_, err = database.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id serial PRIMARY KEY,
-			username VARCHAR (50),
-			email VARCHAR (100)
-		);
-	`)
-	if err != nil {
-		logger.Log.Panicln("Error while migration: ", err)
-	}
-
-	// Update the migrations table to track the applied migration.
-	// _, err = database.Exec(`
-	// 	INSERT INTO migrations (version, description) VALUES (1, 'Creat Users Table');
-	// `)
-	// if err != nil {
-	// 	logger.Log.Panicln("Error while migration: ", err)
-	// }
-
 }
 
 // MigrateDB finds the last run migration, and run all those after it in order

@@ -22,7 +22,7 @@ tmp_dir = "tmp"
   stop_on_error = true
 
 [color]
-  app = ""
+  app = "red"
   build = "yellow"
   main = "magenta"
   runner = "green"
