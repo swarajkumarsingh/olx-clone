@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql"
 	"errors"
 	"olx-clone/infra/db"
 	"time"
@@ -22,6 +23,16 @@ func CalculateTotalPages(page, itemsPerPage int) int {
 		return 1
 	}
 	return (page + itemsPerPage - 1) / itemsPerPage
+}
+
+func GetAllUsersQuery(ctx *gin.Context, itemsPerPage int, offset int) (*sql.Rows, error) {
+	database := db.Mgr.DBConn
+	rows, err := database.Query(`SELECT id, name, email FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
+	if err != nil {
+		return rows, err
+	}
+	defer rows.Close()
+	return rows, nil
 }
 
 func InsertUser(ctx *gin.Context, body UserBody, hashedPassword string) error {

@@ -59,27 +59,23 @@ func GetUsers(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	itemsPerPage, _ := strconv.Atoi(ctx.DefaultQuery("per_page", strconv.Itoa(pageSize)))
 
-	// Calculate the offset to determine the starting record for the current page.
 	offset := (page - 1) * itemsPerPage
-
-	// Query the users from the database with pagination.
-	rows, err := database.Query(`SELECT id, name, email FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
+	rows, err := database.Query(`SELECT id, name, email, number FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
 		return
 	}
 	defer rows.Close()
 
-	// Iterate through the rows and build a slice of user data.
 	var users []gin.H
 	for rows.Next() {
 		var id int
-		var username, email string
-		if err := rows.Scan(&id, &username, &email); err != nil {
+		var username, email, number string
+		if err := rows.Scan(&id, &username, &email, &number); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan user data"})
 			return
 		}
-		users = append(users, gin.H{"id": id, "username": username, "email": email})
+		users = append(users, gin.H{"id": id, "username": username, "email": email, "number": number})
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
