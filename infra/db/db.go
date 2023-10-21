@@ -85,7 +85,6 @@ var log = logger.Log
 func init() {
 	var err error
 	sqltrace.Register("postgres", &pq.Driver{}, sqltrace.WithServiceName(conf.ClientENV))
-	log.Println(DBConfig["conn_string"])
 	database, err := sqlxtrace.Open(DBConfig["driver"], "postgres://postgres:postgres@host.docker.internal:5432/olx_clone?sslmode=disable")
 	if err != nil {
 		log.Errorln(err)
@@ -94,8 +93,12 @@ func init() {
 
 	err = database.Ping()
 	if err != nil {
-		log.Errorln("Error while pinging the DB", err)
+		log.Errorln("Error while pinging the DB:", err)
 		panic(err)
+	}
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	maxOpenConn := 50

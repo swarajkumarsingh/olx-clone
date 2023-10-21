@@ -58,8 +58,48 @@ func writeMetadata(scriptName string) bool {
 
 // MigrateDB finds the last run migration, and run all those after it in order
 func MigrateDB() {
+
+	database := db.Mgr.DBConn
+	
+	// Create a migration table if it doesn't exist.
+	_, err := database.Exec(`
+		CREATE TABLE IF NOT EXISTS migrations (
+			id serial PRIMARY KEY,
+			version INT,
+			description TEXT
+		);
+	`)
+
+	if err != nil {
+		log.Errorln("Error while pinging the DB", err)
+		panic(err)
+	}
+
+	_, err = database.Exec(`
+		CREATE TABLE IF NOT EXISTS users (
+			id serial PRIMARY KEY,
+			username VARCHAR (50),
+			email VARCHAR (100)
+		);
+	`)
+	if err != nil {
+		logger.Log.Panicln("Error while migration: ", err)
+	}
+
+	// Update the migrations table to track the applied migration.
+	// _, err = database.Exec(`
+	// 	INSERT INTO migrations (version, description) VALUES (1, 'Creat Users Table');
+	// `)
+	// if err != nil {
+	// 	logger.Log.Panicln("Error while migration: ", err)
+	// }
+
+}
+
+// MigrateDB finds the last run migration, and run all those after it in order
+func MigrateDB2() {
 	// Get a list of migration files
-	files, err := filepath.Glob("./scripts/*.sql")
+	files, err := filepath.Glob("scripts/*.sql")
 	if err != nil {
 		log.Printf("Error running restore %s", err)
 		return
