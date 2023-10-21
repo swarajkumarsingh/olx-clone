@@ -5,6 +5,7 @@ import (
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,12 +53,20 @@ func CreateUser(ctx *gin.Context) {
 func GetUsers(ctx *gin.Context) {
 	errorHandler.Recovery(ctx, http.StatusInternalServerError)
 
-	// check if user is admin only then proceed
-
+	const pageSize = 10
 	database := db.Mgr.DBConn
-	rows, err := database.Query(`SELECT id, name, email FROM "user"`)
+
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	itemsPerPage, _ := strconv.Atoi(ctx.DefaultQuery("per_page", strconv.Itoa(pageSize)))
+
+	// Calculate the offset to determine the starting record for the current page.
+	offset := (page - 1) * itemsPerPage
+
+	// Query the users from the database with pagination.
+	rows, err := database.Query(`SELECT id, name, email FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
 	if err != nil {
-		logger.WithRequest(ctx).Panicln(err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
+		return
 	}
 	defer rows.Close()
 
@@ -67,11 +76,18 @@ func GetUsers(ctx *gin.Context) {
 		var id int
 		var username, email string
 		if err := rows.Scan(&id, &username, &email); err != nil {
-			logger.WithRequest(ctx).Panicln(err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan user data"})
+			return
 		}
 		users = append(users, gin.H{"id": id, "username": username, "email": email})
 	}
-	ctx.JSON(http.StatusOK, users)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"users":       users,
+		"page":        page,
+		"per_page":    itemsPerPage,
+		"total_pages": CalculateTotalPages(page, itemsPerPage),
+	})
 }
 
 // get user
