@@ -195,12 +195,12 @@ docker_setup_db() {
 	local dbAlreadyExists
 	dbAlreadyExists="$(
 		POSTGRES_DB= docker_process_sql --dbname postgres --set db="$POSTGRES_DB" --tuples-only <<-'EOSQL'
-			SELECT 1 FROM pg_database WHERE datname = 'kyc_app' ;
+			SELECT 1 FROM pg_database WHERE datname = 'olx_clone' ;
 		EOSQL
 	)"
 	if [ -z "$dbAlreadyExists" ]; then
 		POSTGRES_DB= docker_process_sql --dbname postgres --set db="$POSTGRES_DB" <<-'EOSQL'
-			CREATE DATABASE "kyc_app" ;
+			CREATE DATABASE "olx_clone" ;
 		EOSQL
 		echo
 	fi

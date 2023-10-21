@@ -29,6 +29,7 @@ func checkFileNameFormat(fileName string) bool {
 // reads the metadata from migrations_metadata table and return last executed script name
 func readMetadata() string {
 	database := db.Mgr.DBConn
+
 	// create migrations table if not exists
 	_, err := database.Exec("CREATE TABLE IF NOT EXISTS migrations_metadata (migrated_at TIMESTAMP, script_name TEXT)")
 	if err != nil {
@@ -58,7 +59,7 @@ func writeMetadata(scriptName string) bool {
 // MigrateDB finds the last run migration, and run all those after it in order
 func MigrateDB() {
 	// Get a list of migration files
-	files, err := filepath.Glob("scripts/*.sql")
+	files, err := filepath.Glob("./scripts/*.sql")
 	if err != nil {
 		log.Printf("Error running restore %s", err)
 		return
@@ -66,7 +67,7 @@ func MigrateDB() {
 
 	// Sort the list alphabetically
 	sort.Strings(files)
-	log.Println(files)
+	log.Println("files:", files)
 
 	// get last run migration
 	log.Println("Reading from Metadata table...")

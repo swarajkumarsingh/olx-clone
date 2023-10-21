@@ -31,7 +31,7 @@ const (
 	ReadOnly = "READ_ONLY"
 )
 
-func getDBConnectionString(access string) string {
+func getDBConnectionString(_ string) string {
 	dbConfig := &DBConfigStruct{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
-	"os"
 
 	"olx-clone/functions/logger"
 	"olx-clone/migrations"
@@ -32,7 +30,6 @@ func enableCORS() gin.HandlerFunc {
 
 func main() {
 	r := gin.Default()
-	fmt.Println("abc", os.Getenv("DB_PASSWORD"))
 
 	// custom middleware
 	r.Use(enableCORS())
@@ -40,7 +37,7 @@ func main() {
 	// run migrations
 	migrations.MigrateDB()
 
-	r.GET("/", func(c *gin.Context) {	
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "health ok",
 		})
