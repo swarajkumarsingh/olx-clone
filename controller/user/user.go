@@ -4,26 +4,15 @@ import (
 	"net/http"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
-	"olx-clone/infra/db"
-	"strconv"
+	model "olx-clone/models/user"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserBody struct {
-	Name       string `json:"name"`
-	Email      string `json:"email"`
-	Password   string `json:"password"`
-	Number     string `json:"number"`
-	Avatar     string `json:"avatar"`
-	Address    string `json:"address"`
-	Created_on string `json:"created_on"`
-}
-
 func CreateUser(ctx *gin.Context) {
-	defer errorHandler.Recovery(ctx, 500)
+	defer errorHandler.Recovery(ctx, http.StatusInternalServerError)
 
-	var body UserBody
+	var body model.UserBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
@@ -33,11 +22,11 @@ func CreateUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	if err = InsertUser(ctx, body, hashedPassword); err != nil {
+	if err = model.InsertUser(body, hashedPassword); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	tokenString, err := GenerateJwtToken(body.Name)
+	token, err := GenerateJwtToken(body.Name)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
@@ -45,22 +34,18 @@ func CreateUser(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"error":   false,
 		"message": "User Created successfully",
-		"token":   tokenString,
+		"token":   token,
 	})
 }
 
-// get user
 func GetUsers(ctx *gin.Context) {
 	errorHandler.Recovery(ctx, http.StatusInternalServerError)
 
-	const pageSize = 10
-	database := db.Mgr.DBConn
+	page := GetCurrentPageValue(ctx)
+	itemsPerPage := GetItemPerPageValue(ctx)
+	offset := GetOffsetValue(page, itemsPerPage)
 
-	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
-	itemsPerPage, _ := strconv.Atoi(ctx.DefaultQuery("per_page", strconv.Itoa(pageSize)))
-
-	offset := (page - 1) * itemsPerPage
-	rows, err := database.Query(`SELECT id, name, email, number FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
+	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln("Failed to retrieve users")
 	}

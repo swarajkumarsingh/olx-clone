@@ -1,9 +1,12 @@
 package user
 
 import (
-	"database/sql"
 	"errors"
-	"olx-clone/infra/db"
+	"olx-clone/conf"
+	"olx-clone/constants"
+	"olx-clone/functions/logger"
+	userModel "olx-clone/models/user"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,11 +14,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtKey = []byte("chotu_babu_is_not_chotu_any_more")
+func GetCurrentPageValue(ctx *gin.Context) int {
+	val, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil {
+		logger.WithRequest(ctx).Errorln("error while extracting current page value: ", err)
+		return 1
+	}
+	return val
+}
 
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
+func GetOffsetValue(page int, itemsPerPage int) int {
+	return (page - 1) * itemsPerPage
+}
+
+func GetItemPerPageValue(ctx *gin.Context) int {
+	val, err := strconv.Atoi(ctx.DefaultQuery("per_page", strconv.Itoa(constants.DefaultPerPageSize)))
+	if err != nil {
+		logger.WithRequest(ctx).Errorln("error while extracting item per-page value: ", err)
+		return constants.DefaultPerPageSize
+	}
+	return val
 }
 
 func CalculateTotalPages(page, itemsPerPage int) int {
@@ -25,28 +43,8 @@ func CalculateTotalPages(page, itemsPerPage int) int {
 	return (page + itemsPerPage - 1) / itemsPerPage
 }
 
-func GetAllUsersQuery(ctx *gin.Context, itemsPerPage int, offset int) (*sql.Rows, error) {
-	database := db.Mgr.DBConn
-	rows, err := database.Query(`SELECT id, name, email FROM "user" ORDER BY id LIMIT $1 OFFSET $2`, itemsPerPage, offset)
-	if err != nil {
-		return rows, err
-	}
-	defer rows.Close()
-	return rows, nil
-}
-
-func InsertUser(ctx *gin.Context, body UserBody, hashedPassword string) error {
-	database := db.Mgr.DBConn
-	query := `INSERT INTO "user"(name, email, password, number) VALUES($1, $2, $3, $4)`
-	_, err := database.Exec(query, body.Name, body.Email, hashedPassword, body.Number)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), constants.BcryptHashingCost)
 	return string(bytes), err
 }
 
@@ -57,14 +55,15 @@ func CheckPasswordHash(password, hash string) bool {
 
 func GenerateJwtToken(name string) (string, error) {
 	expirationTime := time.Now().Add(5 * 24 * time.Hour)
-	claims := &Claims{
+	claims := &userModel.Claims{
 		Username: name,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(conf.JWTSecretKey)
 	if err != nil {
 		return "", err
 	}

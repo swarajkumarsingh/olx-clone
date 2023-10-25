@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"olx-clone/functions/logger"
 	"os"
 	"regexp"
@@ -16,17 +17,18 @@ func GenerateSQLFile(tableName string) {
 	timeString := time.Now().Format("20060102150405.003059_")
 	regexString := regexp.MustCompile(`^(.*?)\.(.*)$`)
 	replaceString := "${1}$2"
-	sb.WriteString("migrations/scripts/")
+	sb.WriteString("../migrations/scripts/")
 	sb.WriteString(regexString.ReplaceAllString(timeString, replaceString))
 	sb.WriteString(tableName)
 	sb.WriteString(".sql")
 	fileName := sb.String()
+	fmt.Println(fileName)
 	emptyFile, err := os.Create(fileName)
+	emptyFile.Close()
 	if err != nil {
-		log.Errorln(err)
+		log.Panicln(err)
 	}
 	log.Println("Created SQL File:", fileName)
-	emptyFile.Close()
 }
 
 func main() {

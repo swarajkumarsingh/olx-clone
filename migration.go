@@ -3,43 +3,18 @@ All migration SQL files reside in scripts folder with following format:
 
 YYYYMMDDHHMMSSmillseconds_tablename.sql
 */
-package migrations
+package main
 
 import (
 	"io/ioutil"
-	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
 
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strings"
 )
 
-var log = logger.Log
-
-func MigrateDB() {
-	database := db.Mgr.DBConn
-
-	// DROP TABLE IF EXISTS "user";
-	_, err := database.Exec(`
-
-		CREATE TABLE IF NOT EXISTS "user" (
-			id SERIAL NOT NULL PRIMARY KEY,
-			name VARCHAR(100) NOT NULL,
-			email VARCHAR(50) NOT NULL,
-			password VARCHAR(200) NOT NULL,
-			number VARCHAR(10) NOT NULL,
-			avatar TEXT,
-			address TEXT,
-			created_at DATE
-		);
-	`)
-	if err != nil {
-		logger.Log.Panicln("Error while migration: ", err)
-	}
-}
-
+// var log = logger.Log
 var fileNameRegex *regexp.Regexp = regexp.MustCompile(`scripts/\d{20}_\S+.sql`)
 
 // checks if sql file name is in correct format
@@ -79,16 +54,16 @@ func writeMetadata(scriptName string) bool {
 }
 
 // MigrateDB finds the last run migration, and run all those after it in order
-func MigrateDB2() {
+func MigrateDB() {
 	// Get a list of migration files
-	files, err := filepath.Glob("scripts/*.sql")
+	files, err := filepath.Glob("./migrations/scripts/*.sql")
 	if err != nil {
 		log.Printf("Error running restore %s", err)
 		return
 	}
 
 	// Sort the list alphabetically
-	sort.Strings(files)
+	// sort.Strings(files)
 	log.Println("files:", files)
 
 	// get last run migration

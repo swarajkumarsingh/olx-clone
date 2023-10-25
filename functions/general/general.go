@@ -34,6 +34,22 @@ import (
 
 var log = logger.Log
 
+// StartTime returns current time
+func StartTime() time.Time {
+	return time.Now()
+}
+
+// TimeDifference returns elapsed time
+func TimeDifference(startTime time.Time) time.Duration {
+	return time.Since(startTime)
+}
+
+// LogTimeDifference logs the elapsed time
+func LogTimeDifference(startTime time.Time) {
+	elapsedTime := TimeDifference(startTime)
+	log.Println("Time taken: ", elapsedTime)
+}
+
 // GetUUID generates and returns a new UUID v4 string
 func GetUUID() string {
 	return uuid.New().String()

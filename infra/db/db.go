@@ -85,7 +85,7 @@ var log = logger.Log
 func init() {
 	var err error
 	sqltrace.Register("postgres", &pq.Driver{}, sqltrace.WithServiceName(conf.ClientENV))
-	database, err := sqlxtrace.Open(DBConfig["driver"], "postgres://postgres:postgres@host.docker.internal:5432/olx_clone?sslmode=disable")
+	database, err := sqlxtrace.Open("postgres", "postgres://postgres:postgres@host.docker.internal:5432/olx_clone?sslmode=disable")
 	if err != nil {
 		log.Errorln(err)
 		panic(err)
@@ -102,6 +102,8 @@ func init() {
 	}
 
 	maxOpenConn := 50
+	ENV_PROD := "prod"
+	ENV := "dev" 
 	if ENV == ENV_PROD {
 		maxOpenConn = 800
 	}

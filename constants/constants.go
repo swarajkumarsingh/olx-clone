@@ -8,4 +8,7 @@ const (
 	ENV_LOCAL = "local"
 )
 
+const DefaultPerPageSize = 10
+const BcryptHashingCost = 8
+
 const VaultKeySuffix = "-vlt"

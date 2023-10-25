@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"olx-clone/functions/logger"
-	"olx-clone/migrations"
 	routes "olx-clone/routes/user"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +35,7 @@ func main() {
 	r.Use(enableCORS())
 
 	// run migrations
-	migrations.MigrateDB()
+	MigrateDB()
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{

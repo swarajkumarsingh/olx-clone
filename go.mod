@@ -11,7 +11,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
-	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.0
 	golang.org/x/crypto v0.8.0
 	golang.org/x/text v0.9.0
@@ -49,6 +48,7 @@ require (
 	github.com/outcaste-io/ristretto v0.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.5.0 // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
