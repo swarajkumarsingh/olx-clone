@@ -17,8 +17,9 @@ func AddUserRoutes(router *gin.Engine) {
 
 	users.POST("/create-user", user.CreateUser)
 	users.GET("/users", user.GetUsers)
-	users.POST("/user/:username", user.CreateUser)
-	users.POST("/login", user.CreateUser)
-	users.POST("/logout", user.CreateUser)
-	users.POST("/delete-user", user.CreateUser)
+	users.POST("/user/:username", user.UpdateUser)
+	users.GET("/user/:username", user.GetUser)
+	users.POST("/login", user.LoginUser)
+	users.POST("/logout", user.LogoutUser)
+	users.POST("/delete-user", user.DeleteUser)
 }

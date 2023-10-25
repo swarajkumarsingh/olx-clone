@@ -6,12 +6,13 @@ YYYYMMDDHHMMSSmillseconds_tablename.sql
 package main
 
 import (
-	"io/ioutil"
-	"olx-clone/infra/db"
-
+	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
+
+	"olx-clone/infra/db"
 )
 
 // var log = logger.Log
@@ -63,7 +64,7 @@ func MigrateDB() {
 	}
 
 	// Sort the list alphabetically
-	// sort.Strings(files)
+	sort.Strings(files)
 	log.Println("files:", files)
 
 	// get last run migration
@@ -78,7 +79,6 @@ func MigrateDB() {
 	completedCount := 0
 
 	for _, file := range files {
-
 		// check file name format
 		if !checkFileNameFormat(file) {
 			log.Println("Invalid file name format for file:", file)
@@ -90,7 +90,7 @@ func MigrateDB() {
 			log.Println("Running migration:", file)
 
 			// reading contents of SQL file
-			content, _ := ioutil.ReadFile(file)
+			content, _ := os.ReadFile(file)
 			// Convert []byte to string
 			sqlQueries := string(content)
 
@@ -114,7 +114,7 @@ func MigrateDB() {
 	}
 
 	if completedCount > 0 {
-		log.Println(completedCount, "Migrations completed. Last completed:", lastCompleted)
+		log.Println(completedCount, " Migrations completed. Last completed:", lastCompleted)
 	} else {
 		log.Println("No migrations performed")
 	}
