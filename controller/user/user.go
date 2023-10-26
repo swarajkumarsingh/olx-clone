@@ -51,7 +51,8 @@ func GetUsers(ctx *gin.Context) {
 	}
 	defer rows.Close()
 
-	var users []gin.H
+	users := make([]gin.H, 0)
+
 	for rows.Next() {
 		var id int
 		var username, email, number string
