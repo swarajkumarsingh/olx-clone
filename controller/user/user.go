@@ -94,3 +94,4 @@ func UpdateUser(ctx *gin.Context) {
 func DeleteUser(ctx *gin.Context) {
 
 }
+

@@ -1,15 +1,16 @@
 package routes
 
 import (
+	"olx-clone/controller/product"
+
 	"github.com/gin-gonic/gin"
 )
 
 func AddProductRoutes(router *gin.Engine) {
-	users := router.Group("/")
+	products := router.Group("/")
 
-	users.POST("/create-product", func(ctx *gin.Context) {
-		ctx.JSON(200, map[string]interface{}{
-			"error": false,
-		})
-	})
+	products.POST("/product/create", product.CreateProduct)
+	products.GET("/product/:pid", product.GetProduct)
+	products.PATCH("/product/:pid", product.UpdateProduct)
+	products.DELETE("/product/:pid", product.DeleteProduct)
 }
