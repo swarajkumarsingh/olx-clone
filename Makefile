@@ -1,3 +1,5 @@
+SCRIPT_FOLDER_NAME = commands
+
 run:
 	docker compose build
 	docker compose up
@@ -19,6 +21,11 @@ dev:
 
 install:
 	go mod tidy
+
+gen:
+	cd $(SCRIPT_FOLDER_NAME) && \
+	go run *.go $n
+	cd ..
 
 deploy: 
 	echo "TODO"
