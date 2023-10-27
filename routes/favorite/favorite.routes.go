@@ -1,4 +1,4 @@
-package routes
+package favoriteRoutes
 
 import (
 	"olx-clone/controller/favorite"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddProductRoutes(router *gin.Engine) {
+func AddRoutes(router *gin.Engine) {
 	favorites := router.Group("/")
 
 	favorites.GET("/favorites", favorite.GetAllFavorite)

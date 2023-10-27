@@ -3,10 +3,12 @@ package main
 import (
 	"net/http"
 
-	"olx-clone/functions/logger"
-	routes "olx-clone/routes/user"
-
 	"github.com/gin-gonic/gin"
+
+	"olx-clone/functions/logger"
+	favoriteRoutes "olx-clone/routes/favorite"
+	productRoutes "olx-clone/routes/product"
+	userRoutes "olx-clone/routes/user"
 )
 
 var log = logger.Log
@@ -29,7 +31,7 @@ func enableCORS() gin.HandlerFunc {
 }
 
 func main() {
-	r := gin.Default()
+	r := gin.Default()	
 
 	// custom middleware
 	r.Use(enableCORS())
@@ -43,7 +45,9 @@ func main() {
 		})
 	})
 
-	routes.AddUserRoutes(r)
+	userRoutes.AddRoutes(r)
+	productRoutes.AddRoutes(r)
+	favoriteRoutes.AddRoutes(r)
 
 	log.Printf("Server Started, version: %s", version)
 	http.ListenAndServe(":8080", r)

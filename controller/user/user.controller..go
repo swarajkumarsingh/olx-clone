@@ -26,7 +26,7 @@ func CreateUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	token, err := GenerateJwtToken(body.Name)
+	token, err := GenerateJwtToken(body.Username)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
@@ -94,4 +94,3 @@ func UpdateUser(ctx *gin.Context) {
 func DeleteUser(ctx *gin.Context) {
 
 }
-

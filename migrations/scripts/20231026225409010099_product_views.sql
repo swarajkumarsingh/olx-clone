@@ -1,5 +1,3 @@
-DROP TABLE product_views;
-
 CREATE TABLE product_views (
     id SERIAL PRIMARY KEY,
     product_id INT REFERENCES products(id),

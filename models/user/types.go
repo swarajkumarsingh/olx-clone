@@ -3,7 +3,8 @@ package userModel
 import "github.com/golang-jwt/jwt/v5"
 
 type UserBody struct {
-	Name       string `json:"name"`
+	Username       string `json:"username"`
+	Fullname       string `json:"fullname"`
 	Email      string `json:"email"`
 	Password   string `json:"password"`
 	Number     string `json:"number"`

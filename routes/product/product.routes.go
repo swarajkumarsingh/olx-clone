@@ -1,4 +1,4 @@
-package routes
+package productRoutes
 
 import (
 	"olx-clone/controller/product"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddProductRoutes(router *gin.Engine) {
+func AddRoutes(router *gin.Engine) {
 	products := router.Group("/")
 
 	products.POST("/product/create", product.CreateProduct)

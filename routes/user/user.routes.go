@@ -1,4 +1,4 @@
-package routes
+package userRoutes
 
 import (
 	"olx-clone/controller/user"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddUserRoutes(router *gin.Engine) {
+func AddRoutes(router *gin.Engine) {
 	users := router.Group("/")
 
 	users.GET("/hello", func(ctx *gin.Context) {
@@ -15,7 +15,7 @@ func AddUserRoutes(router *gin.Engine) {
 		})
 	})
 
-	users.POST("/create-user", user.CreateUser)
+	users.POST("/create/user", user.CreateUser)
 	users.GET("/users", user.GetUsers)
 	users.POST("/user/:username", user.UpdateUser)
 	users.GET("/user/:username", user.GetUser)

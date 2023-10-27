@@ -1,5 +1,3 @@
-DROP TABLE sellers;
-
 CREATE TABLE sellers (
 	id SERIAL NOT NULL PRIMARY KEY,
 	username VARCHAR(500) NOT NULL,
