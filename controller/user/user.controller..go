@@ -77,7 +77,7 @@ func GetUser(ctx *gin.Context) {
 
 // login
 func LoginUser(ctx *gin.Context) {
-
+	
 }
 
 // logout

@@ -9,12 +9,12 @@ type UserBody struct {
 	Password   string `json:"password"`
 	Number     string `json:"number"`
 	Avatar     string `json:"avatar"`
-	Address    string `json:"address"`
+	Location    string `json:"location"`
+	Coordinates    string `json:"coordinates"`
 	Created_on string `json:"created_on"`
 }
 
 type Claims struct {
 	Username string `json:"username"`
-
 	jwt.RegisteredClaims
 }
