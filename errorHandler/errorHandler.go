@@ -26,7 +26,7 @@ func Recovery(c *gin.Context, httpStatusCode int) {
 		msg, ok := r.(string)
 		if ok {
 			// string message passed - no need to report to sentry
-			CustomError(c, httpStatusCode, msg, strconv.Itoa(httpStatusCode))
+			CustomError(c, httpStatusCode, msg)
 		} else {
 			err, ok := r.(error)
 			msg = constants.SomethingWentWrongMessage
@@ -37,7 +37,7 @@ func Recovery(c *gin.Context, httpStatusCode int) {
 				CustomErrorSentry(c, httpStatusCode, msg, err, strconv.Itoa(httpStatusCode))
 			} else {
 				// when string or error cannot be recovered (rare case)
-				CustomError(c, http.StatusInternalServerError, constants.SomethingWentWrongMessage, strconv.Itoa(httpStatusCode))
+				CustomError(c, http.StatusInternalServerError, constants.SomethingWentWrongMessage)
 			}
 		}
 	}
@@ -49,14 +49,14 @@ func CustomErrorSentry(c *gin.Context, httpStatusCode int, msg string, err error
 		// report to sentry first if environment is prod, uat or dev
 		ReportToSentry(c, err)
 	}
-	CustomError(c, httpStatusCode, msg, errorCode)
+	CustomError(c, httpStatusCode, msg)
 }
 
 // CustomError returns an error message without reporting to sentry
-func CustomError(c *gin.Context, httpStatusCode int, msg string, errorCode string) {
+func CustomError(c *gin.Context, httpStatusCode int, msg string) {
 	errJSON := map[string]interface{}{
-		"statusCode": errorCode,
-		"error":      msg,
+		"error": true,
+		"message":      msg,
 	}
 	respondwithJSON(c, httpStatusCode, errJSON)
 }

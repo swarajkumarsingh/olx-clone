@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql"
 	"net/http"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
@@ -15,6 +16,11 @@ func CreateUser(ctx *gin.Context) {
 	var body model.UserBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	if model.UserAlreadyExistsWithUsername(body.Username) {
+		errorHandler.CustomError(ctx, http.StatusBadRequest, "User Already exists")
+		return
 	}
 
 	hashedPassword, err := HashPassword(body.Password)
@@ -72,12 +78,29 @@ func GetUsers(ctx *gin.Context) {
 
 // get user
 func GetUser(ctx *gin.Context) {
+	errorHandler.Recovery(ctx, http.StatusInternalServerError)
 
+	username := ctx.Param("username")
+	user, err := model.GetUserByUsername(username)
+
+	if err == sql.ErrNoRows {
+		errorHandler.CustomError(ctx, http.StatusNotFound, "User not found")
+		return
+	}
+
+	if err != nil {
+		logger.Log.Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error": false,
+		"user":  user,
+	})
 }
 
 // login
 func LoginUser(ctx *gin.Context) {
-	
+
 }
 
 // logout
