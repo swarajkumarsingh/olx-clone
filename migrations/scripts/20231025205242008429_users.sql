@@ -4,7 +4,7 @@ CREATE TABLE users (
 	fullname VARCHAR(100) NOT NULL,
 	email VARCHAR(100) NOT NULL,
 	password VARCHAR(200) NOT NULL,
-	phone VARCHAR(10) NOT NULL,
+	phone VARCHAR(12) NOT NULL,
 	avatar TEXT,
 	location TEXT,
 	coordinates TEXT,

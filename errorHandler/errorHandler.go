@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"olx-clone/conf"
 	"olx-clone/constants"
+	"olx-clone/constants/messages"
 	"olx-clone/functions/logger"
 	"strconv"
 
@@ -29,7 +30,7 @@ func Recovery(c *gin.Context, httpStatusCode int) {
 			CustomError(c, httpStatusCode, msg)
 		} else {
 			err, ok := r.(error)
-			msg = constants.SomethingWentWrongMessage
+			msg = messages.SomethingWentWrongMessage
 			if ok {
 				// if error object found report to sentry
 				logger.WithRequest(c).Errorln("recovered: ", r)
@@ -37,7 +38,7 @@ func Recovery(c *gin.Context, httpStatusCode int) {
 				CustomErrorSentry(c, httpStatusCode, msg, err, strconv.Itoa(httpStatusCode))
 			} else {
 				// when string or error cannot be recovered (rare case)
-				CustomError(c, http.StatusInternalServerError, constants.SomethingWentWrongMessage)
+				CustomError(c, http.StatusInternalServerError, messages.SomethingWentWrongMessage)
 			}
 		}
 	}

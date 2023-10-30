@@ -14,6 +14,16 @@ type UserBody struct {
 	Created_at  string `json:"created_at"`
 }
 
+type UserUpdateBody struct {
+	Username        string `json:"username"`
+	Fullname        string `json:"fullname"`
+	Email           string `json:"email"`
+	Phone           string `json:"phone"`
+	Avatar          string `json:"avatar"`
+	Location        string `json:"location"`
+	Coordinates     string `json:"coordinates"`
+}
+
 type User struct {
 	Id          int    `json:"id"`
 	Username    string `json:"username"`
@@ -25,6 +35,11 @@ type User struct {
 	Location    string `json:"location"`
 	Coordinates string `json:"coordinates"`
 	Created_at  string `json:"created_on"`
+}
+
+type LoginUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type Claims struct {

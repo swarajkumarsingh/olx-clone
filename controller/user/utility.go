@@ -2,10 +2,12 @@ package user
 
 import (
 	"errors"
+	"log"
 	"olx-clone/conf"
 	"olx-clone/constants"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
-	userModel "olx-clone/models/user"
+	model "olx-clone/models/user"
 	"strconv"
 	"time"
 
@@ -21,6 +23,42 @@ func GetCurrentPageValue(ctx *gin.Context) int {
 		return 1
 	}
 	return val
+}
+
+func getCurrentUserName(ctx *gin.Context) (string, error) {
+	username := ctx.Param("username")
+	if username == "" {
+		return "", errors.New("invalid username")
+	}
+	return username, nil
+}
+
+func getUserUpdateBody(ctx *gin.Context) (model.UserUpdateBody, error) {
+	var body model.UserUpdateBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		return body, errors.New("invalid username or password")
+	}
+	return body, nil
+}
+
+func GetUserNameFromParam(ctx *gin.Context) (string, bool) {
+	username := ctx.Param("username")
+	valid := general.ValidUserName(username)
+	log.Println(valid)
+
+	if !valid {
+		return "", false
+	}
+
+	return username, true
+}
+
+func GetUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
+	var loginCredentials model.LoginUser
+	if err := ctx.ShouldBindJSON(&loginCredentials); err != nil || !general.ValidUserName(loginCredentials.Username) {
+		return "", "", errors.New("invalid username or password")
+	}
+	return loginCredentials.Username, loginCredentials.Password, nil
 }
 
 func GetOffsetValue(page int, itemsPerPage int) int {
@@ -43,7 +81,7 @@ func CalculateTotalPages(page, itemsPerPage int) int {
 	return (page + itemsPerPage - 1) / itemsPerPage
 }
 
-func HashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), constants.BcryptHashingCost)
 	return string(bytes), err
 }
@@ -55,7 +93,7 @@ func CheckPasswordHash(password, hash string) bool {
 
 func GenerateJwtToken(name string) (string, error) {
 	expirationTime := time.Now().Add(5 * 24 * time.Hour)
-	claims := &userModel.Claims{
+	claims := &model.Claims{
 		Username: name,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

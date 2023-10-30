@@ -40,7 +40,6 @@ var cpuTemp = prometheus.NewGauge(prometheus.GaugeOpts{
 
 func CustomMetricsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// config logic to check cpu temperature
 		cpuTemp.Set(float64(100))
 		totalRequests.Inc()
 		c.Next()
@@ -80,6 +79,7 @@ func main() {
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
+			"error": false,
 			"message": "health ok",
 		})
 	})

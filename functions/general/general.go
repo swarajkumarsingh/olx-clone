@@ -34,6 +34,17 @@ import (
 
 var log = logger.Log
 
+// ValidUserName return bool if the username if valid, to prevent SQL injection
+func ValidUserName(username string) bool {
+	list := [4]string{"'", "--", "void", "null"}
+	for _, v := range list {
+		if strings.Contains(username, v) {
+			return false
+		}
+	}
+	return true
+}
+
 // StartTime returns current time
 func StartTime() time.Time {
 	return time.Now()
