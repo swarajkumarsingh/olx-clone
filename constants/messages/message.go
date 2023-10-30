@@ -1,7 +1,7 @@
 package messages
 
 const (
-	SomethingWentWrongMessage = "Something went wrong"
+	SomethingWentWrongMessage = "something went wrong"
 	InvalidUsernameMessage    = "invalid username"
 	UserNotFoundMessage       = "user not found"
 )

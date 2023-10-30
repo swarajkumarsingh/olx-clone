@@ -174,8 +174,5 @@ func DeleteUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	ctx.JSON(http.StatusNoContent, gin.H{
-		"error":   false,
-		"message": "user deleted successfully",
-	})
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }

@@ -2,11 +2,13 @@
 package errorHandler
 
 import (
+	"encoding/json"
 	"net/http"
 	"olx-clone/conf"
 	"olx-clone/constants"
 	"olx-clone/constants/messages"
 	"olx-clone/functions/logger"
+	models "olx-clone/models/error"
 	"strconv"
 
 	sentry "github.com/getsentry/sentry-go"
@@ -14,6 +16,15 @@ import (
 )
 
 var log = logger.Log
+
+func stringToStruct(str string) (models.CustomError, error) {
+	var s models.CustomError
+	err := json.Unmarshal([]byte(str), &s)
+	if err != nil {
+		return models.CustomError{}, err
+	}
+	return s, nil
+}
 
 func respondwithJSON(c *gin.Context, code int, response map[string]interface{}) {
 	c.Set("Content-Type", "application/json")
@@ -24,10 +35,18 @@ func respondwithJSON(c *gin.Context, code int, response map[string]interface{}) 
 // Recovery handles the panic happening on any function, this is to be called by defer in functions
 func Recovery(c *gin.Context, httpStatusCode int) {
 	if r := recover(); r != nil {
-		msg, ok := r.(string)
+		msg := messages.SomethingWentWrongMessage
+		code := http.StatusConflict
+
+		rawStruct, ok := r.(string)
+		definedStruct, _ := stringToStruct(rawStruct)
+		
+		msg = definedStruct.Message
+		code = definedStruct.Status_code
+
 		if ok {
 			// string message passed - no need to report to sentry
-			CustomError(c, httpStatusCode, msg)
+			CustomError(c, code, msg)
 		} else {
 			err, ok := r.(error)
 			msg = messages.SomethingWentWrongMessage
@@ -56,8 +75,8 @@ func CustomErrorSentry(c *gin.Context, httpStatusCode int, msg string, err error
 // CustomError returns an error message without reporting to sentry
 func CustomError(c *gin.Context, httpStatusCode int, msg string) {
 	errJSON := map[string]interface{}{
-		"error": true,
-		"message":      msg,
+		"error":   true,
+		"message": msg,
 	}
 	respondwithJSON(c, httpStatusCode, errJSON)
 }
