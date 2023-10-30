@@ -48,8 +48,8 @@ func GetUserByUsername(username string) (User, error) {
 }
 
 func UpdateUser(context context.Context, username string, body UserUpdateBody) error {
-	query := "UPDATE users SET username = $2, email = $3, phone = $4, avatar = $5, location = $6, coordinates = $7, fullname = $8 WHERE username = $1"
-	res, err := database.ExecContext(context, query, username, body.Username, body.Email, body.Phone, body.Avatar, body.Location, body.Coordinates, body.Fullname)
+	query := "UPDATE users SET username = $2, avatar = $3, location = $4, coordinates = $5, fullname = $6 WHERE username = $1"
+	res, err := database.ExecContext(context, query, username, body.Username, body.Avatar, body.Location, body.Coordinates, body.Fullname)
 	if err != nil {
 		return err
 	}

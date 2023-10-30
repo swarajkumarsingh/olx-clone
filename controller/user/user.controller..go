@@ -176,3 +176,27 @@ func DeleteUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusNoContent, gin.H{})
 }
+
+// change password
+func ResetPassword(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+}
+
+// change email
+func ChangeEmail(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+}
+
+// change phone
+func ChangePhoneNumber(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+}
+
+// view all viewed products
+func ViewedProducts(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+}

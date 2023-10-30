@@ -17,7 +17,6 @@ type UserBody struct {
 type UserUpdateBody struct {
 	Username        string `json:"username"`
 	Fullname        string `json:"fullname"`
-	Email           string `json:"email"`
 	Phone           string `json:"phone"`
 	Avatar          string `json:"avatar"`
 	Location        string `json:"location"`
