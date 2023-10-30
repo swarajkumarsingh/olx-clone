@@ -25,7 +25,7 @@ func GetCurrentPageValue(ctx *gin.Context) int {
 	return val
 }
 
-func getCurrentUserName(ctx *gin.Context) (string, error) {
+func getUserName(ctx *gin.Context) (string, error) {
 	username := ctx.Param("username")
 	if username == "" {
 		return "", errors.New("invalid username")
@@ -33,7 +33,7 @@ func getCurrentUserName(ctx *gin.Context) (string, error) {
 	return username, nil
 }
 
-func getUserUpdateBody(ctx *gin.Context) (model.UserUpdateBody, error) {
+func getUserUpdateMethodBody(ctx *gin.Context) (model.UserUpdateBody, error) {
 	var body model.UserUpdateBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		return body, errors.New("invalid username or password")

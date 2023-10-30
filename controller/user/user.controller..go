@@ -140,17 +140,17 @@ func LoginUser(ctx *gin.Context) {
 func UpdateUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	body, err := getUserUpdateBody(ctx)
+	body, err := getUserUpdateMethodBody(ctx)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	currentUsername, err := getCurrentUserName(ctx)
+	username, err := getUserName(ctx)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	if err = model.UpdateUser(context.TODO(), currentUsername, body); err != nil {
+	if err = model.UpdateUser(context.TODO(), username, body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
