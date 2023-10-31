@@ -54,6 +54,8 @@ func (l *Logger) Panicln(values ...any) {
 	valueType := checkValueType(values[0])
 	if valueType == STRING {
 		panicString(l, values[0])
+	} else if isError(values[0]) {
+		panicError(l, values[0])
 	}
 	panicCodeAndString(l, values[0], values[1])
 }
@@ -106,6 +108,11 @@ func checkValueType(value any) string {
 	}
 }
 
+func panicError(l *Logger, value interface{}) {
+	err, _ := value.(error)
+	panicString(l, err.Error())
+}
+
 func panicString(l *Logger, value interface{}) {
 	code := http.StatusConflict
 
@@ -123,6 +130,11 @@ func panicString(l *Logger, value interface{}) {
 
 	l.Error().Msg(msg)
 	panic(msg)
+}
+
+func isError(err any) bool {
+	_, isErr := err.(error)
+	return isErr
 }
 
 func panicCodeAndString(l *Logger, a interface{}, b interface{}) {
