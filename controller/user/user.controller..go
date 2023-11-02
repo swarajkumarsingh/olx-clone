@@ -21,7 +21,7 @@ func CreateUser(ctx *gin.Context) {
 	}
 
 	if model.UserAlreadyExistsWithUsername(body.Username) {
-		errorHandler.CustomError(ctx, http.StatusBadRequest, "User Already exists")
+		errorHandler.CustomError(ctx, http.StatusBadRequest, messages.UserAlreadyExistsMessage)
 		return
 	}
 
