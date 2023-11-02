@@ -26,6 +26,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/text/language"
@@ -33,6 +34,11 @@ import (
 )
 
 var log = logger.Log
+
+func ValidateStruct(s interface{}) error {
+	v := validator.New()
+	return v.Struct(s)
+}
 
 // ValidUserName return bool if the username if valid, to prevent SQL injection
 func ValidUserName(username string) bool {

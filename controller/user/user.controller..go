@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/user"
 
@@ -18,6 +19,10 @@ func CreateUser(ctx *gin.Context) {
 	var body model.UserBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err.Error())
 	}
 
 	if model.UserAlreadyExistsWithUsername(body.Username) {

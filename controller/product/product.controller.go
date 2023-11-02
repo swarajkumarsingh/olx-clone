@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"olx-clone/errorHandler"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/product"
 
@@ -17,6 +18,10 @@ func CreateProduct(ctx *gin.Context) {
 	var body model.CreateProductBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err.Error())
 	}
 
 	if err := model.CreateProduct(context.TODO(), body); err != nil {
@@ -33,11 +38,19 @@ func CreateProduct(ctx *gin.Context) {
 func GetProduct(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	productId := ctx.Param("pid")
+	productId := GetProductIdFromParams(ctx)
 
 	product, err := model.GetProduct(context.TODO(), productId)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	userId, valid := GetUserIdFromReq(ctx)
+	if valid {
+		err = model.AddProductViews(context.TODO(), userId, productId)
+		if err != nil {
+			logger.WithRequest(ctx).Errorln(err)
+		}
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -47,7 +60,6 @@ func GetProduct(ctx *gin.Context) {
 }
 
 // update product
-
 func UpdateProduct(ctx *gin.Context) {
 
 }

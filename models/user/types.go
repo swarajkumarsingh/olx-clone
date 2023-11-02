@@ -3,11 +3,11 @@ package userModel
 import "github.com/golang-jwt/jwt/v5"
 
 type UserBody struct {
-	Username    string `json:"username"`
-	Fullname    string `json:"fullname"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	Phone       string `json:"phone"`
+	Username    string `validate:"required" json:"username"`
+	Fullname    string `validate:"required" json:"fullname"`
+	Email       string `validate:"required" json:"email"`
+	Password    string `validate:"required" json:"password"`
+	Phone       string `validate:"required" json:"phone"`
 	Avatar      string `json:"avatar"`
 	Location    string `json:"location"`
 	Coordinates string `json:"coordinates"`
@@ -15,12 +15,12 @@ type UserBody struct {
 }
 
 type UserUpdateBody struct {
-	Username    string `json:"username"`
-	Fullname    string `json:"fullname"`
-	Phone       string `json:"phone"`
-	Avatar      string `json:"avatar"`
-	Location    string `json:"location"`
-	Coordinates string `json:"coordinates"`
+	Username    string `validate:"required" json:"username"`
+	Fullname    string `validate:"required" json:"fullname"`
+	Phone       string `validate:"required" json:"phone"`
+	Avatar      string `validate:"required" json:"avatar"`
+	Location    string `validate:"required" json:"location"`
+	Coordinates string `validate:"required" json:"coordinates"`
 }
 
 type User struct {

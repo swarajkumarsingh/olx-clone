@@ -1,7 +1,7 @@
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    description TEXT,
+    description TEXT NOT NULL,
 	location TEXT NOT NULL,
 	coordinates TEXT NOT NULL,
     views BIGINT DEFAULT 0,

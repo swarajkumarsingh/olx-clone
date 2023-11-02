@@ -137,13 +137,13 @@ func isError(err any) bool {
 	return isErr
 }
 
-func panicCodeAndString(l *Logger, a interface{}, b interface{}) {
-	code, err := convertAnyToInteger(a)
+func panicCodeAndString(l *Logger, rawCode interface{}, rawString interface{}) {
+	code, err := convertAnyToInteger(rawCode)
 	if err != nil {
 		code = http.StatusConflict
 	}
 
-	message := convertAnyToString(b)
+	message := convertAnyToString(rawString)
 
 	model := models.CustomError{
 		Status_code: code,
