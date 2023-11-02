@@ -2,7 +2,9 @@ package product
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
+	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
@@ -42,6 +44,10 @@ func GetProduct(ctx *gin.Context) {
 
 	product, err := model.GetProduct(context.TODO(), productId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.ProductNotFoundMessage)
+		}
+
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
