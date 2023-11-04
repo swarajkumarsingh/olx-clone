@@ -2,6 +2,7 @@ package productModel
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"olx-clone/constants/messages"
 	"olx-clone/infra/db"
@@ -33,6 +34,14 @@ func GetProduct(context context.Context, productId string) (ProductModel, error)
 	}
 	return productModel, nil
 }
+
+
+
+func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
+	query := `SELECT id, title, views, price FROM products ORDER BY id LIMIT $1 OFFSET $2`
+	return database.Query(query, itemsPerPage, offset)
+}
+
 
 func AddProductViews(context context.Context, userId, productId string) error {
 	query := "INSERT INTO  product_views(user_id, product_id) VALUES($1, $2)"

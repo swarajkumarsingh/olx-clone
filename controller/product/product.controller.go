@@ -65,6 +65,38 @@ func GetProduct(ctx *gin.Context) {
 	})
 }
 
+func GetProducts(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	page := GetCurrentPageValue(ctx)
+	itemsPerPage := GetItemPerPageValue(ctx)
+	offset := GetOffsetValue(page, itemsPerPage)
+
+	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveProductsMessage)
+	}
+	defer rows.Close()
+
+	products := make([]gin.H, 0)
+
+	for rows.Next() {
+		var id int
+		var title, views, price string
+		if err := rows.Scan(&id, &title, &views, &price); err != nil {
+			logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveProductsMessage)
+		}
+		products = append(products, gin.H{"id": id, "title": title, "views": views, "price": price})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"users":       products,
+		"page":        page,
+		"per_page":    itemsPerPage,
+		"total_pages": CalculateTotalPages(page, itemsPerPage),
+	})
+}
+
 // update product
 func UpdateProduct(ctx *gin.Context) {
 

@@ -60,7 +60,7 @@ func GetUsers(ctx *gin.Context) {
 
 	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
 	if err != nil {
-		logger.WithRequest(ctx).Panicln("Failed to retrieve users")
+		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
 	}
 	defer rows.Close()
 
@@ -70,7 +70,7 @@ func GetUsers(ctx *gin.Context) {
 		var id int
 		var username, email, number string
 		if err := rows.Scan(&id, &username, &email, &number); err != nil {
-			logger.WithRequest(ctx).Panicln("Failed to retrieve users")
+			logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
 		}
 		users = append(users, gin.H{"id": id, "username": username, "email": email, "number": number})
 	}
