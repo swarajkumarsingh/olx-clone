@@ -16,7 +16,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetCurrentPageValue(ctx *gin.Context) int {
+func getCurrentPageValue(ctx *gin.Context) int {
 	val, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	if err != nil {
 		logger.WithRequest(ctx).Errorln("error while extracting current page value: ", err)
@@ -41,7 +41,7 @@ func getUserUpdateMethodBody(ctx *gin.Context) (model.UserUpdateBody, error) {
 	return body, nil
 }
 
-func GetUserNameFromParam(ctx *gin.Context) (string, bool) {
+func getUserNameFromParam(ctx *gin.Context) (string, bool) {
 	username := ctx.Param("username")
 	valid := general.ValidUserName(username)
 	log.Println(valid)
@@ -53,7 +53,7 @@ func GetUserNameFromParam(ctx *gin.Context) (string, bool) {
 	return username, true
 }
 
-func GetCreateUserBody(ctx *gin.Context) (model.UserBody, error) {
+func getCreateUserBody(ctx *gin.Context) (model.UserBody, error) {
 	var body model.UserBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		return body, err
@@ -65,7 +65,7 @@ func GetCreateUserBody(ctx *gin.Context) (model.UserBody, error) {
 	return body, nil
 }
 
-func GetUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
+func getUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
 	var loginCredentials model.LoginUser
 	if err := ctx.ShouldBindJSON(&loginCredentials); err != nil || !general.ValidUserName(loginCredentials.Username) {
 		return "", "", errors.New("invalid username or password")
@@ -73,7 +73,7 @@ func GetUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
 	return loginCredentials.Username, loginCredentials.Password, nil
 }
 
-func GetResetPasswordCredentialsFromBody(ctx *gin.Context) (model.ResetPasswordStruct, error) {
+func getResetPasswordCredentialsFromBody(ctx *gin.Context) (model.ResetPasswordStruct, error) {
 	var model model.ResetPasswordStruct
 	if err := ctx.ShouldBindJSON(&model); err != nil {
 		return model, errors.New("invalid body")
@@ -84,11 +84,11 @@ func GetResetPasswordCredentialsFromBody(ctx *gin.Context) (model.ResetPasswordS
 	return model, nil
 }
 
-func GetOffsetValue(page int, itemsPerPage int) int {
+func getOffsetValue(page int, itemsPerPage int) int {
 	return (page - 1) * itemsPerPage
 }
 
-func GetItemPerPageValue(ctx *gin.Context) int {
+func getItemPerPageValue(ctx *gin.Context) int {
 	val, err := strconv.Atoi(ctx.DefaultQuery("per_page", strconv.Itoa(constants.DefaultPerPageSize)))
 	if err != nil {
 		logger.WithRequest(ctx).Errorln("error while extracting item per-page value: ", err)
@@ -97,7 +97,7 @@ func GetItemPerPageValue(ctx *gin.Context) int {
 	return val
 }
 
-func CalculateTotalPages(page, itemsPerPage int) int {
+func calculateTotalPages(page, itemsPerPage int) int {
 	if page <= 0 {
 		return 1
 	}
@@ -109,12 +109,7 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
-func GenerateJwtToken(name string) (string, error) {
+func generateJwtToken(name string) (string, error) {
 	expirationTime := time.Now().Add(5 * 24 * time.Hour)
 	claims := &model.Claims{
 		Username: name,

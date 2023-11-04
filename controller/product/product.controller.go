@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/product"
 
@@ -17,13 +16,9 @@ import (
 func CreateProduct(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	var body model.CreateProductBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		logger.WithRequest(ctx).Panicln(err)
-	}
-
-	if err := general.ValidateStruct(body); err != nil {
-		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err.Error())
+	body, err := getCreateProductBody(ctx)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
 	if err := model.CreateProduct(context.TODO(), body); err != nil {
@@ -40,7 +35,7 @@ func CreateProduct(ctx *gin.Context) {
 func GetProduct(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	productId := GetProductIdFromParams(ctx)
+	productId := getProductIdFromParams(ctx)
 
 	product, err := model.GetProduct(context.TODO(), productId)
 	if err != nil {
@@ -51,7 +46,7 @@ func GetProduct(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	userId, valid := GetUserIdFromReq(ctx)
+	userId, valid := getUserIdFromReq(ctx)
 	if valid {
 		err = model.AddProductViews(context.TODO(), userId, productId)
 		if err != nil {
@@ -68,9 +63,9 @@ func GetProduct(ctx *gin.Context) {
 func GetProducts(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	page := GetCurrentPageValue(ctx)
-	itemsPerPage := GetItemPerPageValue(ctx)
-	offset := GetOffsetValue(page, itemsPerPage)
+	page := getCurrentPageValue(ctx)
+	itemsPerPage := getItemPerPageValue(ctx)
+	offset := getOffsetValue(page, itemsPerPage)
 
 	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
 	if err != nil {
@@ -93,7 +88,7 @@ func GetProducts(ctx *gin.Context) {
 		"users":       products,
 		"page":        page,
 		"per_page":    itemsPerPage,
-		"total_pages": CalculateTotalPages(page, itemsPerPage),
+		"total_pages": calculateTotalPages(page, itemsPerPage),
 	})
 }
 

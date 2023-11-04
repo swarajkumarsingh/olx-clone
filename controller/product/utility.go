@@ -1,23 +1,39 @@
 package product
 
 import (
+	"errors"
 	"olx-clone/constants"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
+	model "olx-clone/models/product"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetProductIdFromParams(ctx *gin.Context) string {
+func getProductIdFromParams(ctx *gin.Context) string {
 	return ctx.Param("pid")
 }
 
+func getCreateProductBody(ctx *gin.Context) (model.CreateProductBody, error) {
+	var body model.CreateProductBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		return body, errors.New("invalid body")
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		return body, err
+	}
+
+	return body, nil
+}
+
 // TODO: Get userId from req.userId
-func GetUserIdFromReq(ctx *gin.Context) (string, bool) {
+func getUserIdFromReq(ctx *gin.Context) (string, bool) {
 	return "1", true
 }
 
-func GetCurrentPageValue(ctx *gin.Context) int {
+func getCurrentPageValue(ctx *gin.Context) int {
 	val, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	if err != nil {
 		logger.WithRequest(ctx).Errorln("error while extracting current page value: ", err)
@@ -26,13 +42,11 @@ func GetCurrentPageValue(ctx *gin.Context) int {
 	return val
 }
 
-
-func GetOffsetValue(page int, itemsPerPage int) int {
+func getOffsetValue(page int, itemsPerPage int) int {
 	return (page - 1) * itemsPerPage
 }
 
-
-func GetItemPerPageValue(ctx *gin.Context) int {
+func getItemPerPageValue(ctx *gin.Context) int {
 	val, err := strconv.Atoi(ctx.DefaultQuery("per_page", strconv.Itoa(constants.DefaultPerPageSize)))
 	if err != nil {
 		logger.WithRequest(ctx).Errorln("error while extracting item per-page value: ", err)
@@ -41,7 +55,7 @@ func GetItemPerPageValue(ctx *gin.Context) int {
 	return val
 }
 
-func CalculateTotalPages(page, itemsPerPage int) int {
+func calculateTotalPages(page, itemsPerPage int) int {
 	if page <= 0 {
 		return 1
 	}

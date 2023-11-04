@@ -15,14 +15,13 @@ import (
 func CreateUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	body, err := GetCreateUserBody(ctx)
+	body, err := getCreateUserBody(ctx)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
 	if model.UserAlreadyExistsWithUsername(body.Username) {
-		errorHandler.CustomError(ctx, http.StatusBadRequest, messages.UserAlreadyExistsMessage)
-		return
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.UserAlreadyExistsMessage)
 	}
 
 	hashedPassword, err := hashPassword(body.Password)
@@ -34,7 +33,7 @@ func CreateUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	token, err := GenerateJwtToken(body.Username)
+	token, err := generateJwtToken(body.Username)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
@@ -49,9 +48,9 @@ func CreateUser(ctx *gin.Context) {
 func GetUsers(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	page := GetCurrentPageValue(ctx)
-	itemsPerPage := GetItemPerPageValue(ctx)
-	offset := GetOffsetValue(page, itemsPerPage)
+	page := getCurrentPageValue(ctx)
+	itemsPerPage := getItemPerPageValue(ctx)
+	offset := getOffsetValue(page, itemsPerPage)
 
 	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
 	if err != nil {
@@ -74,7 +73,7 @@ func GetUsers(ctx *gin.Context) {
 		"users":       users,
 		"page":        page,
 		"per_page":    itemsPerPage,
-		"total_pages": CalculateTotalPages(page, itemsPerPage),
+		"total_pages": calculateTotalPages(page, itemsPerPage),
 	})
 }
 
@@ -82,7 +81,7 @@ func GetUsers(ctx *gin.Context) {
 func GetUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	username, valid := GetUserNameFromParam(ctx)
+	username, valid := getUserNameFromParam(ctx)
 	if !valid {
 		errorHandler.CustomError(ctx, http.StatusBadRequest, messages.InvalidUsernameMessage)
 		return
@@ -107,7 +106,7 @@ func GetUser(ctx *gin.Context) {
 func LoginUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	username, password, err := GetUserNameAndPasswordFromBody(ctx)
+	username, password, err := getUserNameAndPasswordFromBody(ctx)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusNotFound, err.Error())
 		return
@@ -121,7 +120,7 @@ func LoginUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	token, err := GenerateJwtToken(username)
+	token, err := generateJwtToken(username)
 
 	if err != nil {
 		logger.WithRequest(ctx).Panicln("unable to login, try again later")
@@ -162,7 +161,7 @@ func UpdateUser(ctx *gin.Context) {
 func DeleteUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	username, valid := GetUserNameFromParam(ctx)
+	username, valid := getUserNameFromParam(ctx)
 	if !valid {
 		errorHandler.CustomError(ctx, http.StatusBadRequest, messages.InvalidUsernameMessage)
 		return
@@ -179,7 +178,7 @@ func DeleteUser(ctx *gin.Context) {
 func ResetPassword(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	body, err := GetResetPasswordCredentialsFromBody(ctx)
+	body, err := getResetPasswordCredentialsFromBody(ctx)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
