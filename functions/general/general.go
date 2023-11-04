@@ -19,7 +19,6 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -648,31 +647,6 @@ func GetDifferenceInMonths(a, b time.Time) int {
 	}
 
 	return months
-}
-
-func SDKVersionGreaterThan(sdkVersion string, thresholdVersion string) bool {
-	if sdkVersion == "web" {
-		// web is always latest
-		return true
-	}
-	checkParts := strings.Split(thresholdVersion, ".")
-	sdkParts := strings.Split(sdkVersion, ".")
-	if len(checkParts) >= 3 && len(sdkParts) >= 3 {
-		for i := 0; i < 3; i++ {
-			if i < 2 {
-				checkPart, _ := strconv.ParseInt(checkParts[i], 10, 32)
-				sdkPart, _ := strconv.ParseInt(sdkParts[i], 10, 32)
-				if checkPart < sdkPart {
-					// sdk part is greater than check part
-					return true
-				}
-			} else if checkParts[i] < sdkParts[i] {
-				// sdk part is greater than check part
-				return true
-			}
-		}
-	}
-	return false
 }
 
 // GetInitial returns two letter initials from a word
