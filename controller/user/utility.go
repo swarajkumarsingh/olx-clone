@@ -61,6 +61,17 @@ func GetUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
 	return loginCredentials.Username, loginCredentials.Password, nil
 }
 
+func GetResetPasswordCredentialsFromBody(ctx *gin.Context) (model.ResetPasswordStruct, error) {
+	var model model.ResetPasswordStruct
+	if err := ctx.ShouldBindJSON(&model); err != nil {
+		return model, errors.New("invalid body")
+	}
+	if err := general.ValidateStruct(model); err != nil {
+		return model, err
+	}
+	return model, nil
+}
+
 func GetOffsetValue(page int, itemsPerPage int) int {
 	return (page - 1) * itemsPerPage
 }

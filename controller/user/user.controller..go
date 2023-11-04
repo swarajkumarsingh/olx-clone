@@ -114,24 +114,22 @@ func LoginUser(ctx *gin.Context) {
 
 	username, password, err := GetUserNameAndPasswordFromBody(ctx)
 	if err != nil {
-		errorHandler.CustomError(ctx, http.StatusBadRequest, err.Error())
+		logger.WithRequest(ctx).Panicln(http.StatusNotFound, err.Error())
 		return
 	}
 
 	_, err = model.IsValidUser(username, password)
-	if err == sql.ErrNoRows {
-		errorHandler.CustomError(ctx, http.StatusNotFound, messages.UserNotFoundMessage)
-		return
-	}
-
 	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
+		}
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
 	token, err := GenerateJwtToken(username)
 
 	if err != nil {
-		logger.WithRequest(ctx).Panicln("Unable to login, try again later")
+		logger.WithRequest(ctx).Panicln("unable to login, try again later")
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
@@ -185,7 +183,26 @@ func DeleteUser(ctx *gin.Context) {
 // change password
 func ResetPassword(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
-	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+
+	body, err := GetResetPasswordCredentialsFromBody(ctx)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	err = model.CheckIfCurrentPasswordIsValid(context.TODO(), body.Username, body.CurrentPassword)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln("invalid password")
+	}
+
+	err = model.UpdatePassword(context.TODO(), body.Username, body.NewPassword)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "Reset password successful",
+	})
 }
 
 // change email

@@ -37,8 +37,14 @@ type User struct {
 }
 
 type LoginUser struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `validate:"required" json:"username"`
+	Password string `validate:"required" json:"password"`
+}
+
+type ResetPasswordStruct struct {
+	Username        string `validate:"required" json:"username"`
+	CurrentPassword string `validate:"required" json:"current_password"`
+	NewPassword     string `validate:"required" json:"new_password"`
 }
 
 type Claims struct {

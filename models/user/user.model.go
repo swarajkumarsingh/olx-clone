@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"olx-clone/constants"
+	"olx-clone/constants/messages"
 	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
@@ -62,12 +64,54 @@ func UpdateUser(context context.Context, username string, body UserUpdateBody) e
 	return nil
 }
 
+func CheckIfCurrentPasswordIsValid(context context.Context, username, password string) error {
+	valid := general.ValidUserName(username)
+	if !valid {
+		return errors.New(messages.InvalidCredentialsMessage)
+	}
+
+	user, err := GetUserByUsername(username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("user does not exists")
+		}
+		return err
+	}
+
+	valid = checkPasswordHash(password, user.Password)
+	if !valid {
+		return errors.New(messages.InvalidCredentialsMessage)
+	}
+
+	return nil
+}
+
+func UpdatePassword(context context.Context, username, newPassword string) error {
+	password, err := hashPassword(newPassword)
+	if err != nil {
+		return errors.New(messages.SomethingWentWrongMessage)
+	}
+
+	query := "UPDATE users SET password = $2 WHERE username = $1"
+	res, err := database.ExecContext(context, query, username, password)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
+}
+
 func IsValidUser(username, password string) (User, error) {
 	var userModel User
 	validUserName := general.ValidUserName(username)
 
 	if !validUserName {
-		return userModel, errors.New("invalid username or password")
+		return userModel, errors.New(messages.InvalidCredentialsMessage)
 	}
 
 	user, err := GetUserByUsername(username)
@@ -78,7 +122,7 @@ func IsValidUser(username, password string) (User, error) {
 	valid := checkPasswordHash(password, user.Password)
 
 	if !valid {
-		return userModel, errors.New("invalid username or password")
+		return userModel, errors.New(messages.InvalidCredentialsMessage)
 	}
 
 	return userModel, nil
@@ -111,4 +155,9 @@ func InsertUser(body UserBody, password string) error {
 func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
 	query := `SELECT id, username, email, phone FROM users ORDER BY id LIMIT $1 OFFSET $2`
 	return database.Query(query, itemsPerPage, offset)
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), constants.BcryptHashingCost)
+	return string(bytes), err
 }
