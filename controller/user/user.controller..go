@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/user"
 
@@ -16,13 +15,9 @@ import (
 func CreateUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	var body model.UserBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		logger.WithRequest(ctx).Panicln(err)
-	}
-
-	if err := general.ValidateStruct(body); err != nil {
-		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err.Error())
+	body, err := GetCreateUserBody(ctx)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
 	if model.UserAlreadyExistsWithUsername(body.Username) {
@@ -191,7 +186,7 @@ func ResetPassword(ctx *gin.Context) {
 
 	err = model.CheckIfCurrentPasswordIsValid(context.TODO(), body.Username, body.CurrentPassword)
 	if err != nil {
-		logger.WithRequest(ctx).Panicln("invalid password")
+		logger.WithRequest(ctx).Panicln(messages.InvalidCredentialsMessage)
 	}
 
 	err = model.UpdatePassword(context.TODO(), body.Username, body.NewPassword)

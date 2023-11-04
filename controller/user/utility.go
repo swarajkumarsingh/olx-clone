@@ -53,6 +53,18 @@ func GetUserNameFromParam(ctx *gin.Context) (string, bool) {
 	return username, true
 }
 
+func GetCreateUserBody(ctx *gin.Context) (model.UserBody, error) {
+	var body model.UserBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		return body, err
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
 func GetUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
 	var loginCredentials model.LoginUser
 	if err := ctx.ShouldBindJSON(&loginCredentials); err != nil || !general.ValidUserName(loginCredentials.Username) {
