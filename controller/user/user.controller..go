@@ -214,5 +214,16 @@ func ChangePhoneNumber(ctx *gin.Context) {
 // view all viewed products
 func ViewedProducts(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
-	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+
+	userId, _ := getUserIdFromReq(ctx)
+
+	data, err := model.GetViewedProducts(userId)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error": false,
+		"data": data,
+	})
 }

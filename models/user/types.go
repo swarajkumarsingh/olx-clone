@@ -41,6 +41,13 @@ type LoginUser struct {
 	Password string `validate:"required" json:"password"`
 }
 
+type ViewedProductStruct struct {
+	Id         int    `json:"id" db:"id"`
+	ProductId  string `json:"product_id" db:"product_id"`
+	UserId     string `json:"user_id" db:"user_id"`
+	Created_at string `json:"created_on" db:"created_at"`
+}
+
 type ResetPasswordStruct struct {
 	Username        string `validate:"required" json:"username"`
 	CurrentPassword string `validate:"required" json:"current_password"`

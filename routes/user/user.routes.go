@@ -11,6 +11,7 @@ func AddRoutes(router *gin.Engine) {
 
 	users.POST("/login", user.LoginUser)
 	users.PATCH("/reset/password", user.ResetPassword)
+	users.GET("/user/viewed", user.ViewedProducts)
 	
 	users.POST("/user", user.CreateUser)
 	users.GET("/users", user.GetUsers)

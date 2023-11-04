@@ -20,6 +20,17 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+func GetViewedProducts(userId string) (any, error) {
+	var model ViewedProductStruct
+
+	query := "SELECT * FROM product_views WHERE user_id = $1"
+	err := database.GetContext(context.TODO(), &model, query, userId)
+	if err == nil {
+		return model, nil
+	}
+	return model, err
+}
+
 func UserAlreadyExistsWithUsername(username string) bool {
 	var exists bool
 	query := "SELECT EXISTS (SELECT 1 FROM users WHERE username = $1)"

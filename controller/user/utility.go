@@ -16,6 +16,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// TODO: Get userId from req.userId
+func getUserIdFromReq(ctx *gin.Context) (string, bool) {
+	return "1", true
+}
+
 func getCurrentPageValue(ctx *gin.Context) int {
 	val, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	if err != nil {
