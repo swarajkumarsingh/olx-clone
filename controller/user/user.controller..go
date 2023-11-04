@@ -224,6 +224,6 @@ func ViewedProducts(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"error": false,
-		"data": data,
+		"products": data,
 	})
 }
