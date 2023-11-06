@@ -2,6 +2,7 @@ package sqs
 
 import (
 	"olx-clone/conf"
+	"olx-clone/functions/retry"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -10,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-var sess, err = session.NewSessionWithOptions(session.Options{
+var sess, _ = session.NewSessionWithOptions(session.Options{
 	Config: aws.Config{
 		Region:      aws.String(conf.AWS_REGION),
 		Credentials: credentials.NewStaticCredentials(conf.AWS_ACCESS_KEY, conf.AWS_SECRET_ACCESS_KEY, conf.AWS_TOKEN),
