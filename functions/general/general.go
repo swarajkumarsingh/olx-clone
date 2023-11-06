@@ -37,7 +37,21 @@ var log = logger.Log
 // ValidateStruct validates the struct and return error if they occur
 func ValidateStruct(s interface{}) error {
 	v := validator.New()
-	return v.Struct(s)
+	err := v.Struct(s)
+
+	if err != nil {
+		var invalidArgs []string
+
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, validationError := range validationErrors {
+				invalidArgs = append(invalidArgs, strings.ToLower(validationError.Field()))
+			}
+		}
+		errorMsg := "Missing or invalid arguments: " + strings.Join(invalidArgs, ", ")
+		return errors.New(errorMsg)
+	}
+
+	return err
 }
 
 // ValidUserName return bool if the username if valid, to prevent SQL injection

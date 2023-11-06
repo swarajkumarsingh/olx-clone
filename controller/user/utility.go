@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"olx-clone/conf"
 	"olx-clone/constants"
+	"olx-clone/constants/messages"
 	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/user"
@@ -164,7 +165,7 @@ func getUserNameFromParam(ctx *gin.Context) (string, bool) {
 func getCreateUserBody(ctx *gin.Context) (model.UserBody, error) {
 	var body model.UserBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		return body, err
+		return body, errors.New(messages.InvalidBodyMessage)
 	}
 
 	if err := general.ValidateStruct(body); err != nil {
