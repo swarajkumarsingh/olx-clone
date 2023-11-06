@@ -63,7 +63,59 @@ func sendOtpEmail(senderId, recipientId, otp string) (*sesService.SendEmailOutpu
 	const charSet = "UTF-8"
 	const subject = "Forgot password? reset your password using the given OTP."
 	var textBody = fmt.Sprintf("Forgot password? <br> <p>Here is your OTP %s from olx, please ignore if you have not requested it", otp)
-	var htmlBody = fmt.Sprintf("<h1>Forgot password?</h1> <br> <p>Here is your OTP %s from olx, please ignore if you have not requested it</p>", otp)
+	var htmlBody = fmt.Sprintf(`
+	<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+        }
+        .otp-container {
+            background-color: #f5f5f5;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .otp-code {
+            font-size: 24px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your OTP Code</h1>
+        <p>Please use the following OTP code for verification:</p>
+        <div class="otp-container">
+            <span class="otp-code">%s</span>
+        </div>
+        <p>This OTP is valid for a limited time. Do not share it with others.</p>
+    </div>
+</body>
+</html>
+	`, otp)
 
 	return ses.SendEmail(senderId, recipientId, subject, htmlBody, textBody, charSet)
 }
