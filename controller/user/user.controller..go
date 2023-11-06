@@ -184,7 +184,7 @@ func ResetPasswordDeprecated(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	err = model.CheckIfCurrentPasswordIsValid(context.TODO(), body.Username, body.CurrentPassword)
+	err = model.CheckIfCurrentPasswordIsValid(context.TODO(), body.Username, body.NewPassword)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidCredentialsMessage)
 	}
@@ -200,7 +200,7 @@ func ResetPasswordDeprecated(ctx *gin.Context) {
 	})
 }
 
-// change password
+// request change password
 func RequestResetPassword(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
@@ -226,14 +226,55 @@ func RequestResetPassword(ctx *gin.Context) {
 
 	otpSecret := encodeString(otp)
 	otpExpiration := getTimeInMinutes(5)
-	err = model.SaveOTPAndExpirationInDB(context.TODO(), user.Username, otpSecret, otpExpiration)
-	if err != nil {
+	if err = model.SaveOTPAndExpirationInDB(context.TODO(), user.Username, otpSecret, otpExpiration); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"error":   false,
 		"message": "OTP send successfully",
+	})
+}
+
+// reset password
+func ResetPassword(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	body, err := getResetPasswordCredentialsFromBody(ctx)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	encodedOTP, err := model.GetValidOtp(context.TODO(), body.Username, body.OTP, body.NewPassword)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	otp, err := decodeString(encodedOTP)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	valid := verifyOTPs(body.OTP, otp)
+	if !valid {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidOTPMessage)
+	}
+
+	err = model.UpdatePassword(context.TODO(), body.Username, body.NewPassword)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	if err = model.ResetOtpAndOtpExpiration(context.TODO(), body.Username); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "Reset password successful",
 	})
 }
 

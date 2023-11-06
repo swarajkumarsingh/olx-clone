@@ -27,6 +27,10 @@ func getUserIdFromReq(ctx *gin.Context) (string, bool) {
 	return "1", true
 }
 
+func verifyOTPs(bodyOtp, dbOtp string) bool {
+	return bodyOtp == dbOtp
+}
+
 func getTimeInMinutes(minute int) time.Time {
 	return time.Now().Add(5 * time.Minute)
 }

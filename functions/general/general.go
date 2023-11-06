@@ -388,13 +388,13 @@ func AESEncrypt(src, key string) string {
 }
 
 // AESDecrypt does decryption of base64 encoded AES encrypted data an returns plain string
-func AESDecrypt(b64src string, key []byte) string {
+func AESDecrypt(b64src string, key string) string {
 	src, err := base64.StdEncoding.DecodeString(b64src)
 	if err != nil {
 		log.Errorln("error decoding base64 content")
 	}
 
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		log.Errorln("err is:", err)
 	}

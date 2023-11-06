@@ -9,15 +9,36 @@ import (
 	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 var database = db.Mgr.DBConn
 
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+func GetValidOtp(context context.Context, username, otp, newPassword string) (string, error) {
+	var OTPSecret string
+	var OTPExpiration time.Time
+
+	query := "SELECT otp, otp_expiration FROM users WHERE username = $1"
+	err := database.QueryRow(query, username).Scan(&OTPSecret, &OTPExpiration)
+	if err != nil {
+		return OTPSecret, err
+	}
+
+	if time.Now().After(OTPExpiration) {
+		return "", errors.New(messages.OTPExpiredMessage)
+	}
+
+	return OTPSecret, nil
+}
+
+func ResetOtpAndOtpExpiration(context context.Context, username string) error {
+	_, err := database.Exec("UPDATE users SET otp = '', otp_expiration = NULL WHERE username = $1", username)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetViewedProducts(userId string) (any, error) {
@@ -199,4 +220,9 @@ func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), constants.BcryptHashingCost)
 	return string(bytes), err
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

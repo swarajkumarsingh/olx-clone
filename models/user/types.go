@@ -51,9 +51,9 @@ type ViewedProductStruct struct {
 }
 
 type ResetPasswordStruct struct {
-	Username        string `validate:"required" json:"username"`
-	CurrentPassword string `validate:"required" json:"current_password"`
-	NewPassword     string `validate:"required" json:"new_password"`
+	OTP         string `validate:"required" json:"otp"`
+	Username    string `validate:"required" json:"username"`
+	NewPassword string `validate:"required" json:"new_password"`
 }
 
 type ResetRequestStruct struct {

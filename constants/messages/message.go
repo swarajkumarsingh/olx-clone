@@ -5,6 +5,8 @@ const (
 	InvalidCredentialsMessage        = "invalid credentials"
 	UserAlreadyExistsMessage         = "user Already exists"
 	InvalidUsernameMessage           = "invalid username"
+	InvalidOTPMessage                = "otp username"
+	OTPExpiredMessage                = "otp expired"
 	UserNotFoundMessage              = "user not found"
 	UserViewedProductNotFoundMessage = "empty products views"
 	ProductNotFoundMessage           = "product not found"

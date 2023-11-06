@@ -15,3 +15,5 @@ const VaultKeySuffix = "-vlt"
 
 const DefaultSenderEmailId = "swaraj.singh.wearingo@gmail.com"
 const DefaultRecipientEmailId = "swaraj.singh.wearingo@gmail.com"
+
+const OtpAESEncryptKey = "fjnsfjsdnfjs"
