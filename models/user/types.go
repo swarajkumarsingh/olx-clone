@@ -24,16 +24,18 @@ type UserUpdateBody struct {
 }
 
 type User struct {
-	Id          int    `json:"id" db:"id"`
-	Username    string `json:"username" db:"username"`
-	Fullname    string `json:"fullname" db:"fullname"`
-	Email       string `json:"email" db:"email"`
-	Password    string `json:"password" db:"password"`
-	Phone       string `json:"phone" db:"phone"`
-	Avatar      string `json:"avatar" db:"avatar"`
-	Location    string `json:"location" db:"location"`
-	Coordinates string `json:"coordinates" db:"coordinates"`
-	Created_at  string `json:"created_on" db:"created_at"`
+	Id            int    `json:"id" db:"id"`
+	Username      string `json:"username" db:"username"`
+	Fullname      string `json:"fullname" db:"fullname"`
+	Email         string `json:"email" db:"email"`
+	Password      string `json:"password" db:"password"`
+	Phone         string `json:"phone" db:"phone"`
+	Avatar        string `json:"avatar" db:"avatar"`
+	Location      string `json:"location" db:"location"`
+	Coordinates   string `json:"coordinates" db:"coordinates"`
+	Created_at    string `json:"created_on" db:"created_at"`
+	OTP           any    `json:"otp" db:"otp"`
+	OTPExpiration any    `json:"otp_expiration" db:"otp_expiration"`
 }
 
 type LoginUser struct {
@@ -52,6 +54,10 @@ type ResetPasswordStruct struct {
 	Username        string `validate:"required" json:"username"`
 	CurrentPassword string `validate:"required" json:"current_password"`
 	NewPassword     string `validate:"required" json:"new_password"`
+}
+
+type ResetRequestStruct struct {
+	Username string `validate:"required" json:"username"`
 }
 
 type Claims struct {

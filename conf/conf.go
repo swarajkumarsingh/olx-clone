@@ -11,7 +11,6 @@ var SentryDSN string = os.Getenv("SENTRY_DSN")
 var S3Bucket = os.Getenv("S3_BUCKET")
 var JWTSecretKey = []byte("chotu_babu_is_not_chotu_any_more")
 
-
 const (
 	ENV_PROD  = constants.ENV_PROD
 	ENV_UAT   = constants.ENV_UAT

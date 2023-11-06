@@ -10,12 +10,18 @@ func AddRoutes(router *gin.Engine) {
 	users := router.Group("/")
 
 	users.POST("/login", user.LoginUser)
-	users.PATCH("/reset/password", user.ResetPassword)
-	users.GET("/user/viewed", user.ViewedProducts)
+
+	users.POST("/request/password", user.RequestResetPassword)
+	users.PATCH("/verify/password", user.RequestResetPassword)
+
+	users.POST("/reset/email", user.ChangeEmail)
+
 	
 	users.POST("/user", user.CreateUser)
 	users.GET("/users", user.GetUsers)
 	users.GET("/user/:username", user.GetUser)
 	users.PATCH("/user/:username", user.UpdateUser)
 	users.DELETE("/user/:username", user.DeleteUser)
+	
+	users.GET("/user/viewed", user.ViewedProducts)
 }

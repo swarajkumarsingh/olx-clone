@@ -1,8 +1,11 @@
 package user
 
 import (
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
+	"math/rand"
 	"olx-clone/conf"
 	"olx-clone/constants"
 	"olx-clone/functions/general"
@@ -11,6 +14,9 @@ import (
 	"strconv"
 	"time"
 
+	ses "olx-clone/infra/ses"
+
+	sesService "github.com/aws/aws-sdk-go/service/ses"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -19,6 +25,43 @@ import (
 // TODO: Get userId from req.userId
 func getUserIdFromReq(ctx *gin.Context) (string, bool) {
 	return "1", true
+}
+
+func generateOtp() (string, error) {
+	b := make([]byte, 4)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	for i := range b {
+		b[i] = byte(rand.Intn(10)) + 48
+	}
+
+	return string(b), nil
+}
+
+func encodeString(input string) string {
+	data := []byte(input)
+	encoded := base64.StdEncoding.EncodeToString(data)
+	return encoded
+}
+
+func decodeString(encoded string) (string, error) {
+	data, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func sendOtpEmail(senderId, recipientId, otp string) (*sesService.SendEmailOutput, error) {
+	const charSet = "UTF-8"
+	const subject = "Forgot password? reset your password using the given OTP."
+	var textBody = fmt.Sprintf("Forgot password? <br> <p>Here is your OTP %s from olx, please ignore if you have not requested it", otp)
+	var htmlBody = fmt.Sprintf("<h1>Forgot password?</h1> <br> <p>Here is your OTP %s from olx, please ignore if you have not requested it</p>", otp)
+
+	return ses.SendEmail(senderId, recipientId, subject, htmlBody, textBody, charSet)
 }
 
 func getCurrentPageValue(ctx *gin.Context) int {
@@ -80,6 +123,17 @@ func getUserNameAndPasswordFromBody(ctx *gin.Context) (string, string, error) {
 
 func getResetPasswordCredentialsFromBody(ctx *gin.Context) (model.ResetPasswordStruct, error) {
 	var model model.ResetPasswordStruct
+	if err := ctx.ShouldBindJSON(&model); err != nil {
+		return model, errors.New("invalid body")
+	}
+	if err := general.ValidateStruct(model); err != nil {
+		return model, err
+	}
+	return model, nil
+}
+
+func getResetRequestCredentialsFromBody(ctx *gin.Context) (model.ResetRequestStruct, error) {
+	var model model.ResetRequestStruct
 	if err := ctx.ShouldBindJSON(&model); err != nil {
 		return model, errors.New("invalid body")
 	}

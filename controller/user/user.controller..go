@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"olx-clone/constants"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/user"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -87,7 +89,7 @@ func GetUser(ctx *gin.Context) {
 		return
 	}
 
-	user, err := model.GetUserByUsername(username)
+	user, err := model.GetUserByUsername(context.TODO(), username)
 	if err == sql.ErrNoRows {
 		errorHandler.CustomError(ctx, http.StatusNotFound, messages.UserNotFoundMessage)
 		return
@@ -112,7 +114,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	_, err = model.IsValidUser(username, password)
+	_, err = model.IsValidUser(context.TODO(), username, password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
@@ -175,7 +177,7 @@ func DeleteUser(ctx *gin.Context) {
 }
 
 // change password
-func ResetPassword(ctx *gin.Context) {
+func ResetPasswordDeprecated(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
 	body, err := getResetPasswordCredentialsFromBody(ctx)
@@ -199,10 +201,50 @@ func ResetPassword(ctx *gin.Context) {
 	})
 }
 
+// change password
+func RequestResetPassword(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	body, err := getResetRequestCredentialsFromBody(ctx)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	user, err := model.CheckIfUsernameExists(context.TODO(), body.Username)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	otp, err := generateOtp()
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	_, err = sendOtpEmail(constants.DefaultSenderEmailId, user.Email, otp)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	otpSecret := encodeString(otp)
+	otpExpiration := time.Now().Add(5 * time.Minute)
+	err = model.SaveOTPAndExpirationInDB(context.TODO(), user.Username, otpSecret, otpExpiration)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "OTP send successfully",
+	})
+}
+
 // change email
 func ChangeEmail(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
-	logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, "pending implementation")
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "implementation pending",
+	})
 }
 
 // change phone
@@ -223,7 +265,7 @@ func ViewedProducts(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"error": false,
+		"error":    false,
 		"products": data,
 	})
 }

@@ -8,5 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 	avatar TEXT,
 	location TEXT,
 	coordinates TEXT,
-	created_at TIMESTAMP DEFAULT NOW()
+	created_at TIMESTAMP DEFAULT NOW(),
+	otp TEXT,
+	otp_expiration TIMESTAMP
 );

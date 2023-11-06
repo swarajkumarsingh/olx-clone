@@ -45,7 +45,7 @@ func UserAlreadyExistsWithUsername(username string) bool {
 	return exists
 }
 
-func GetUserByUsername(username string) (User, error) {
+func GetUserByUsername(context context.Context, username string) (User, error) {
 	var userModel User
 	validUserName := general.ValidUserName(username)
 	if !validUserName {
@@ -53,11 +53,26 @@ func GetUserByUsername(username string) (User, error) {
 	}
 
 	query := "SELECT * FROM users WHERE username = $1"
-	err := database.GetContext(context.TODO(), &userModel, query, username)
+	err := database.GetContext(context, &userModel, query, username)
 	if err == nil {
 		return userModel, nil
 	}
 	return userModel, err
+}
+
+func SaveOTPAndExpirationInDB(context context.Context, username, otp string, expiration any) error {
+	query := "UPDATE users SET otp = $2, otp_expiration = $3 WHERE username = $1"
+	res, err := database.ExecContext(context, query, username, otp, expiration)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
 }
 
 func UpdateUser(context context.Context, username string, body UserUpdateBody) error {
@@ -75,13 +90,26 @@ func UpdateUser(context context.Context, username string, body UserUpdateBody) e
 	return nil
 }
 
+func CheckIfUsernameExists(context context.Context, username string) (User, error) {
+	var user User
+	user, err := GetUserByUsername(context, username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New(messages.UserNotFoundMessage)
+		}
+		return user, err
+	}
+
+	return user, nil
+}
+
 func CheckIfCurrentPasswordIsValid(context context.Context, username, password string) error {
 	valid := general.ValidUserName(username)
 	if !valid {
 		return errors.New(messages.InvalidCredentialsMessage)
 	}
 
-	user, err := GetUserByUsername(username)
+	user, err := GetUserByUsername(context, username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("user does not exists")
@@ -117,7 +145,7 @@ func UpdatePassword(context context.Context, username, newPassword string) error
 	return nil
 }
 
-func IsValidUser(username, password string) (User, error) {
+func IsValidUser(context context.Context, username, password string) (User, error) {
 	var userModel User
 	validUserName := general.ValidUserName(username)
 
@@ -125,7 +153,7 @@ func IsValidUser(username, password string) (User, error) {
 		return userModel, errors.New(messages.InvalidCredentialsMessage)
 	}
 
-	user, err := GetUserByUsername(username)
+	user, err := GetUserByUsername(context, username)
 	if err != nil {
 		return userModel, err
 	}

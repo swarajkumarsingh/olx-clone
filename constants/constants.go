@@ -12,3 +12,6 @@ const DefaultPerPageSize = 10
 const BcryptHashingCost = 8
 
 const VaultKeySuffix = "-vlt"
+
+const DefaultSenderEmailId = "swaraj.singh.wearingo@gmail.com"
+const DefaultRecipientEmailId = "swaraj.singh.wearingo@gmail.com"

@@ -5,3 +5,4 @@ main
 db
 run.sh
 .vscode
+aws.go
