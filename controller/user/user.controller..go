@@ -9,7 +9,6 @@ import (
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/user"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -226,7 +225,7 @@ func RequestResetPassword(ctx *gin.Context) {
 	}
 
 	otpSecret := encodeString(otp)
-	otpExpiration := time.Now().Add(5 * time.Minute)
+	otpExpiration := getTimeInMinutes(5)
 	err = model.SaveOTPAndExpirationInDB(context.TODO(), user.Username, otpSecret, otpExpiration)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
@@ -261,6 +260,9 @@ func ViewedProducts(ctx *gin.Context) {
 
 	data, err := model.GetViewedProducts(userId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserViewedProductNotFoundMessage)
+		}
 		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
 	}
 

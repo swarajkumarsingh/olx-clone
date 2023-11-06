@@ -27,6 +27,10 @@ func getUserIdFromReq(ctx *gin.Context) (string, bool) {
 	return "1", true
 }
 
+func getTimeInMinutes(minute int) time.Time {
+	return time.Now().Add(5 * time.Minute)
+}
+
 func generateOtp() (string, error) {
 	b := make([]byte, 4)
 	_, err := rand.Read(b)
