@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"olx-clone/conf"
 	"olx-clone/constants"
 	"olx-clone/constants/messages"
@@ -37,17 +36,12 @@ func getTimeInMinutes(minute int) time.Time {
 }
 
 func generateOtp() (string, error) {
-	b := make([]byte, 4)
-	_, err := rand.Read(b)
+	result, err := general.GenerateRandomNumber(4)
 	if err != nil {
-		return "", err
+		return result, err
 	}
 
-	for i := range b {
-		b[i] = byte(rand.Intn(10)) + 48
-	}
-
-	return string(b), nil
+	return result, nil
 }
 
 func encodeString(input string) string {

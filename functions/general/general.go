@@ -111,6 +111,18 @@ func GenerateRandomString(n int) (string, error) {
 	return string(bytes), nil
 }
 
+func GenerateRandomNumber(n int) (string, error) {
+	const letters = "0123456789"
+	bytes, err := GenerateRandomBytes(n)
+	if err != nil {
+		return "", err
+	}
+	for i, b := range bytes {
+		bytes[i] = letters[b%byte(len(letters))]
+	}
+	return string(bytes), nil
+}
+
 // InArrStr is func that checks for val in Array of type of string
 func InArrStr(val string, arr []string) bool {
 	for _, v := range arr {
