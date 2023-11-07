@@ -24,8 +24,7 @@ func AddFavorite(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
-	err := model.AddFavorite(context.TODO(), body.UserId, body.ProductId)
-	if err != nil {
+	if err := model.AddFavorite(context.TODO(), body.UserId, body.ProductId); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
 	}
 
@@ -37,7 +36,18 @@ func AddFavorite(ctx *gin.Context) {
 
 // remove products from favorite
 func DeleteFavorite(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	fid := ctx.Param("fid")
+
+	if err := model.RemoveFavorite(context.TODO(), fid); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"error":   false,
+		"message": "removed from favorites successfully",
+	})
 }
 
 // get all user favorites product

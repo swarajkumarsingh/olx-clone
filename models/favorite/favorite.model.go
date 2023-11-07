@@ -22,3 +22,18 @@ func AddFavorite(context context.Context, userId, productId string) error {
 	}
 	return nil
 }
+
+func RemoveFavorite(context context.Context, fid string) error {
+	query := "DELETE FROM favorites WHERE id = $1"
+	res, err := database.ExecContext(context, query, fid)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("favorite already deleted or favorite not found")
+	}
+
+	return err
+}
