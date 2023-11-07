@@ -3,6 +3,7 @@ package favorite
 import (
 	"context"
 	"net/http"
+	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
@@ -51,6 +52,34 @@ func DeleteFavorite(ctx *gin.Context) {
 }
 
 // get all user favorites product
-func GetAllFavorite(ctx *gin.Context) {
+func GetAllUsersFavorite(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	page := getCurrentPageValue(ctx)
+	itemsPerPage := getItemPerPageValue(ctx)
+	offset := getOffsetValue(page, itemsPerPage)
+
+	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
+	}
+	defer rows.Close()
+
+	users := make([]gin.H, 0)
+
+	for rows.Next() {
+		var id int
+		var userId, productId string
+		if err := rows.Scan(&id, &userId, &productId); err != nil {
+			logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
+		}
+		users = append(users, gin.H{"id": id, "userId": userId, "productId": productId})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"users":       users,
+		"page":        page,
+		"per_page":    itemsPerPage,
+		"total_pages": calculateTotalPages(page, itemsPerPage),
+	})
 }

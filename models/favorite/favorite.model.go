@@ -2,6 +2,7 @@ package favoriteModel
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"olx-clone/constants/messages"
 	"olx-clone/infra/db"
@@ -36,4 +37,9 @@ func RemoveFavorite(context context.Context, fid string) error {
 	}
 
 	return err
+}
+
+func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
+	query := `SELECT id, user_id, product_id FROM favorites ORDER BY id LIMIT $1 OFFSET $2`
+	return database.Query(query, itemsPerPage, offset)
 }
