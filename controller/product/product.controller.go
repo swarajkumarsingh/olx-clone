@@ -126,5 +126,17 @@ func UpdateProduct(ctx *gin.Context) {
 
 // delete product
 func DeleteProduct(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	productId := ctx.Param("pid")
+
+	if err := model.DeleteProductViewsByProductId(context.TODO(), productId); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	if err := model.DeleteProductByProductId(context.TODO(), productId); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }

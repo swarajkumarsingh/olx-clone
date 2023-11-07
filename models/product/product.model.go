@@ -50,6 +50,33 @@ func UpdateProduct(context context.Context, productId string, body ProductUpdate
 	return nil
 }
 
+func DeleteProductByProductId(context context.Context, productId string) error {
+	query := "DELETE FROM products WHERE id = $1"
+	res, err := database.ExecContext(context, query, productId)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("product already deleted or product not found")
+	}
+
+	return err
+}
+
+func DeleteProductViewsByProductId(context context.Context, productId string) error {
+	query := "DELETE FROM product_views WHERE product_id = $1"
+	_, err := database.ExecContext(context, query, productId)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
 func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
 	query := `SELECT id, title, views, price FROM products ORDER BY id LIMIT $1 OFFSET $2`
 	return database.Query(query, itemsPerPage, offset)
