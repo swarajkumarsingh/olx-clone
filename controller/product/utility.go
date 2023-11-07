@@ -15,6 +15,14 @@ func getProductIdFromParams(ctx *gin.Context) string {
 	return ctx.Param("pid")
 }
 
+func getUpdateProductBody(ctx *gin.Context) (model.ProductUpdateStruct, error) {
+	var body model.ProductUpdateStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		return body, errors.New("invalid body")
+	}
+	return body, nil
+}
+
 func getCreateProductBody(ctx *gin.Context) (model.CreateProductBody, error) {
 	var body model.CreateProductBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {

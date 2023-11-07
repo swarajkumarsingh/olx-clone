@@ -9,6 +9,14 @@ type CreateProductBody struct {
 	SellerId    string `json:"seller_id" validate:"required"`
 }
 
+type ProductUpdateStruct struct {
+	Title       string `validate:"required" json:"title"`
+	Description string `validate:"required" json:"description"`
+	Location    string `validate:"required" json:"location"`
+	Coordinates string `validate:"required" json:"coordinates"`
+	Price       string `validate:"required" json:"price"`
+}
+
 type ProductModel struct {
 	Id          int    `json:"id" db:"id"`
 	Title       string `json:"title" db:"title"`

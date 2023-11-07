@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/product"
 
@@ -94,7 +95,33 @@ func GetProducts(ctx *gin.Context) {
 
 // update product
 func UpdateProduct(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	// get body & validate
+	body, err := getUpdateProductBody(ctx)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	err = general.ValidateStruct(body)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
+	}
+
+	// get product id from params
+	pid := ctx.Param("pid")
+
+	// update query
+	err = model.UpdateProduct(context.TODO(), pid, body)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	// show response
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "product updated successfully",
+	})
 }
 
 // delete product

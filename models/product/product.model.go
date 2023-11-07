@@ -35,13 +35,25 @@ func GetProduct(context context.Context, productId string) (ProductModel, error)
 	return productModel, nil
 }
 
+func UpdateProduct(context context.Context, productId string, body ProductUpdateStruct) error {
+	query := "UPDATE products SET title = $2, description = $3, location = $4, coordinates = $5, price = $6 WHERE id = $1"
+	res, err := database.ExecContext(context, query, productId, body.Title, body.Description, body.Location, body.Coordinates, body.Price)
+	if err != nil {
+		return err
+	}
 
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
+}
 
 func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
 	query := `SELECT id, title, views, price FROM products ORDER BY id LIMIT $1 OFFSET $2`
 	return database.Query(query, itemsPerPage, offset)
 }
-
 
 func AddProductViews(context context.Context, userId, productId string) error {
 	query := "INSERT INTO  product_views(user_id, product_id) VALUES($1, $2)"
