@@ -55,11 +55,12 @@ func DeleteFavorite(ctx *gin.Context) {
 func GetAllUsersFavorite(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	userId, _ := getUserIdFromReq(ctx)
 	page := getCurrentPageValue(ctx)
 	itemsPerPage := getItemPerPageValue(ctx)
 	offset := getOffsetValue(page, itemsPerPage)
 
-	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
+	rows, err := model.GetUsersListPaginatedValue(userId, itemsPerPage, offset)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
 	}

@@ -39,7 +39,7 @@ func RemoveFavorite(context context.Context, fid string) error {
 	return err
 }
 
-func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
-	query := `SELECT id, user_id, product_id FROM favorites ORDER BY id LIMIT $1 OFFSET $2`
-	return database.Query(query, itemsPerPage, offset)
+func GetUsersListPaginatedValue(userId string, itemsPerPage, offset int) (*sql.Rows, error) {
+	query := `SELECT id, user_id, product_id FROM favorites WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3`
+	return database.Query(query, userId, itemsPerPage, offset)
 }
