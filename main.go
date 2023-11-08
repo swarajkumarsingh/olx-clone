@@ -77,7 +77,7 @@ func main() {
 	// run migrations
 	MigrateDB()
 
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"error":   false,
 			"message": "health ok",
