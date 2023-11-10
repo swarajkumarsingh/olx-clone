@@ -51,7 +51,36 @@ func CreateSeller(ctx *gin.Context) {
 
 // get all seller - admin
 func GetAllSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	page := getCurrentPageValue(ctx)
+	itemsPerPage := getItemPerPageValue(ctx)
+	offset := getOffsetValue(page, itemsPerPage)
+
+	rows, err := model.GetSellerListPaginatedValue(itemsPerPage, offset)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
+	}
+	defer rows.Close()
+
+	sellers := make([]gin.H, 0)
+
+	for rows.Next() {
+		var id int
+		var username, email, number string
+		if err := rows.Scan(&id, &username, &email, &number); err != nil {
+			logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
+		}
+		sellers = append(sellers, gin.H{"id": id, "username": username, "email": email, "number": number})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":       false,
+		"sellers":     sellers,
+		"page":        page,
+		"per_page":    itemsPerPage,
+		"total_pages": calculateTotalPages(page, itemsPerPage),
+	})
 }
 
 // get user

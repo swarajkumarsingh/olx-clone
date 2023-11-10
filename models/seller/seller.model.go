@@ -1,6 +1,7 @@
 package sellerModel
 
 import (
+	"database/sql"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
 )
@@ -37,4 +38,9 @@ func SellerAlreadyExistsWithUsername(username string) bool {
 	}
 
 	return exists
+}
+
+func GetSellerListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
+	query := `SELECT id, username, email, phone FROM sellers ORDER BY id LIMIT $1 OFFSET $2`
+	return database.Query(query, itemsPerPage, offset)
 }
