@@ -77,3 +77,18 @@ func UpdateSeller(context context.Context, username string, body SellerUpdateStr
 
 	return nil
 }
+
+func DeleteSellerByUsername(username string) error {
+	query := "DELETE FROM sellers WHERE username = $1"
+	res, err := database.ExecContext(context.TODO(), query, username)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("user already deleted or user not found")
+	}
+
+	return err
+}

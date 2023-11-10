@@ -141,7 +141,19 @@ func UpdateSeller(ctx *gin.Context) {
 
 // delete
 func DeleteSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	username := ctx.Param("sid")
+	if username == "" {
+		errorHandler.CustomError(ctx, http.StatusBadRequest, messages.InvalidUsernameMessage)
+		return
+	}
+
+	if err := model.DeleteSellerByUsername(username); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusNoContent, gin.H{})
 }
 
 // request reset password
