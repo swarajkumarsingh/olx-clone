@@ -1,7 +1,10 @@
 package sellerModel
 
 import (
+	"context"
 	"database/sql"
+	"errors"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
 )
@@ -43,4 +46,19 @@ func SellerAlreadyExistsWithUsername(username string) bool {
 func GetSellerListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
 	query := `SELECT id, username, email, phone FROM sellers ORDER BY id LIMIT $1 OFFSET $2`
 	return database.Query(query, itemsPerPage, offset)
+}
+
+func GetSellerByUsername(context context.Context, username string) (Seller, error) {
+	var userModel Seller
+	validUserName := general.ValidUserName(username)
+	if !validUserName {
+		return userModel, errors.New("invalid username")
+	}
+
+	query := "SELECT * FROM sellers WHERE username = $1"
+	err := database.GetContext(context, &userModel, query, username)
+	if err == nil {
+		return userModel, nil
+	}
+	return userModel, err
 }

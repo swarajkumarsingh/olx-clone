@@ -10,10 +10,11 @@ const (
 	InvalidOTPMessage                = "otp username"
 	OTPExpiredMessage                = "otp expired"
 	UserNotFoundMessage              = "user not found"
+	SellerNotFoundMessage            = "seller not found"
 	UserViewedProductNotFoundMessage = "empty products views"
 	ProductNotFoundMessage           = "product not found"
 	FailedToRetrieveProductsMessage  = "failed to retrieve products"
 	FailedToSendEmailMessage         = "failed to send email"
 	FailedToRetrieveUsersMessage     = "failed to retrieve users"
-	FailedToRetrieveSellersMessage     = "failed to retrieve sellers"
+	FailedToRetrieveSellersMessage   = "failed to retrieve sellers"
 )

@@ -20,6 +20,27 @@ type SellerBody struct {
 	AccountStatus string `json:"account_status"`
 }
 
+type Seller struct {
+	Id            int    `json:"id" db:"id"`
+	Username      string `json:"username" db:"username"`
+	Description   string `json:"description" db:"description"`
+	Fullname      string `json:"fullname" db:"fullname"`
+	Email         string `json:"email" db:"email"`
+	Password      string `json:"password" db:"password"`
+	Phone         string `json:"phone" db:"phone"`
+	Avatar        string `json:"avatar" db:"avatar"`
+	Location      string `json:"location" db:"location"`
+	Coordinates   string `json:"coordinates" db:"coordinates"`
+	City          any    `json:"city" db:"city"`
+	State         any    `json:"state" db:"state"`
+	Country       any    `json:"country" db:"country"`
+	ZipCode       any    `json:"zip_code" db:"zip_code"`
+	Verified      string `json:"is_verified" db:"is_verified"`
+	Rating        string `json:"rating" db:"rating"`
+	AccountStatus string `json:"account_status" db:"account_status"`
+	Created_at    string `json:"created_on" db:"created_at"`
+}
+
 type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims

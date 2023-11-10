@@ -1,6 +1,8 @@
 package seller
 
 import (
+	"context"
+	"database/sql"
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
@@ -85,7 +87,25 @@ func GetAllSeller(ctx *gin.Context) {
 
 // get user
 func GetSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	username := ctx.Param("sid")
+	if username == "" {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidUsernameMessage)
+	}
+
+	seller, err := model.GetSellerByUsername(context.TODO(), username)
+	if err == sql.ErrNoRows {
+		logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.SellerNotFoundMessage)
+	}
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error": false,
+		"user":  seller,
+	})
 }
 
 // login
