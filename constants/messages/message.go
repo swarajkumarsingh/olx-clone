@@ -4,7 +4,7 @@ const (
 	SomethingWentWrongMessage        = "something went wrong"
 	InvalidCredentialsMessage        = "invalid credentials"
 	UserAlreadyExistsMessage         = "user Already exists"
-	SellerAlreadyExistsMessage       = "user Already exists"
+	SellerAlreadyExistsMessage       = "seller Already exists"
 	InvalidUsernameMessage           = "invalid username"
 	InvalidBodyMessage               = "invalid body"
 	InvalidOTPMessage                = "otp username"

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
+	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/seller"
 
@@ -14,13 +15,17 @@ import (
 func CreateSeller(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	body, err := getCreateSellerBody(ctx)
-	if err != nil {
+	var body model.SellerBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
 	if model.SellerAlreadyExistsWithUsername(body.Username) {
-		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.UserAlreadyExistsMessage)
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.SellerAlreadyExistsMessage)
 	}
 
 	hashedPassword, err := hashPassword(body.Password)
