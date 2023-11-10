@@ -120,7 +120,23 @@ func LogoutSeller(ctx *gin.Context) {
 
 // update
 func UpdateSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	var body model.SellerUpdateStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	username := ctx.Param("sid")
+
+	if err := model.UpdateSeller(context.TODO(), username, body); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "Seller updated successfully",
+	})
 }
 
 // delete

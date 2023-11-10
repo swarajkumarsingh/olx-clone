@@ -41,6 +41,20 @@ type Seller struct {
 	Created_at    string `json:"created_on" db:"created_at"`
 }
 
+type SellerUpdateStruct struct {
+	Username    string `json:"username" db:"username"`
+	Description string `json:"description" db:"description"`
+	Fullname    string `json:"fullname" db:"fullname"`
+	Phone       string `json:"phone" db:"phone"`
+	Avatar      string `json:"avatar" db:"avatar"`
+	Location    string `json:"location" db:"location"`
+	Coordinates string `json:"coordinates" db:"coordinates"`
+	City        any    `json:"city" db:"city"`
+	State       any    `json:"state" db:"state"`
+	Country     any    `json:"country" db:"country"`
+	ZipCode     any    `json:"zip_code" db:"zip_code"`
+}
+
 type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims

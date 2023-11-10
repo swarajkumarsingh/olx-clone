@@ -62,3 +62,18 @@ func GetSellerByUsername(context context.Context, username string) (Seller, erro
 	}
 	return userModel, err
 }
+
+func UpdateSeller(context context.Context, username string, body SellerUpdateStruct) error {
+	query := "UPDATE sellers SET username = $2, avatar = $3, location = $4, coordinates = $5, fullname = $6, description = $7, city = $8, state = $9, country = $10, zip_code = $11 WHERE username = $1"
+	res, err := database.ExecContext(context, query, username, body.Username, body.Avatar, body.Location, body.Coordinates, body.Fullname, body.Description, body.City, body.State, body.Country, body.ZipCode)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
+}
