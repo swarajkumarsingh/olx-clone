@@ -18,7 +18,10 @@ CREATE TABLE IF NOT EXISTS sellers (
 	country VARCHAR(50),
 	zip_code VARCHAR(10),
 
-	created_at TIMESTAMP DEFAULT NOW(),
     rating TEXT DEFAULT '0',
-	account_status TEXT DEFAULT 'active'
+	account_status TEXT DEFAULT 'active',
+	created_at TIMESTAMP DEFAULT NOW(),
+
+	otp TEXT,
+	otp_expiration TIMESTAMP
 );

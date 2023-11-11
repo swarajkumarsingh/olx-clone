@@ -29,5 +29,5 @@ func AddRoutes(router *gin.Engine) {
 	sellers.DELETE("/seller/:sid", seller.DeleteSeller)
 
 	sellers.POST("/seller/verify/password", seller.ResetPasswordSeller)
-	sellers.POST("/seller/request/password", seller.RequestResetPasswordSeller)
+	sellers.POST("/seller/request/password", seller.RequestResetPassword)
 }

@@ -16,12 +16,12 @@ import (
 
 var database = db.Mgr.DBConn
 
-func GetValidOtp(context context.Context, username, otp, newPassword string) (string, error) {
+func GetOtpFromDB(context context.Context, username string) (string, error) {
 	var OTPSecret string
 	var OTPExpiration time.Time
 
 	query := "SELECT otp, otp_expiration FROM users WHERE username = $1"
-	err := database.QueryRow(query, username).Scan(&OTPSecret, &OTPExpiration)
+	err := database.QueryRowContext(context, query, username).Scan(&OTPSecret, &OTPExpiration)
 	if err != nil {
 		return OTPSecret, err
 	}
@@ -34,7 +34,7 @@ func GetValidOtp(context context.Context, username, otp, newPassword string) (st
 }
 
 func ResetOtpAndOtpExpiration(context context.Context, username string) error {
-	_, err := database.Exec("UPDATE users SET otp = '', otp_expiration = NULL WHERE username = $1", username)
+	_, err := database.ExecContext(context, "UPDATE users SET otp = '', otp_expiration = NULL WHERE username = $1", username)
 	if err != nil {
 		return err
 	}

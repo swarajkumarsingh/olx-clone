@@ -245,7 +245,7 @@ func ResetPassword(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	encodedOTP, err := model.GetValidOtp(context.TODO(), body.Username, body.OTP, body.NewPassword)
+	encodedOTP, err := model.GetOtpFromDB(context.TODO(), body.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)

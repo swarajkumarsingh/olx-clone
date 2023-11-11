@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"olx-clone/constants"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
 	"olx-clone/functions/general"
@@ -157,8 +158,43 @@ func DeleteSeller(ctx *gin.Context) {
 }
 
 // request reset password
-func RequestResetPasswordSeller(ctx *gin.Context) {
+func RequestResetPassword(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	var body model.ResetRequestStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
+	}
+
+	user, err := model.CheckIfUsernameExists(context.TODO(), body.Username)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	otp, err := generateOtp()
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	_, err = sendOtpEmail(constants.DefaultSenderEmailId, user.Email, otp)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	otpSecret := encodeString(otp)
+	otpExpiration := getTimeInMinutes(5)
+	if err = model.SaveOTPAndExpirationInDB(context.TODO(), user.Username, otpSecret, otpExpiration); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "OTP send successfully",
+	})
 }
 
 // reset password

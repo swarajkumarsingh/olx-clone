@@ -4,9 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"olx-clone/constants"
+	"olx-clone/constants/messages"
 	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	"olx-clone/infra/db"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var database = db.Mgr.DBConn
@@ -78,6 +83,95 @@ func UpdateSeller(context context.Context, username string, body SellerUpdateStr
 	return nil
 }
 
+func GetUserByUsername(context context.Context, username string) (Seller, error) {
+	var userModel Seller
+	validUserName := general.ValidUserName(username)
+	if !validUserName {
+		return userModel, errors.New("invalid username")
+	}
+
+	query := "SELECT * FROM sellers WHERE username = $1"
+	err := database.GetContext(context, &userModel, query, username)
+	if err == nil {
+		return userModel, nil
+	}
+	return userModel, err
+}
+
+func CheckIfUsernameExists(context context.Context, username string) (Seller, error) {
+	var user Seller
+	user, err := GetUserByUsername(context, username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New(messages.UserNotFoundMessage)
+		}
+		return user, err
+	}
+
+	return user, nil
+}
+
+
+func ResetOtpAndOtpExpiration(context context.Context, username string) error {
+	_, err := database.ExecContext(context, "UPDATE sellers SET otp = '', otp_expiration = NULL WHERE username = $1", username)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdatePassword(context context.Context, username, newPassword string) error {
+	password, err := hashPassword(newPassword)
+	if err != nil {
+		return errors.New(messages.SomethingWentWrongMessage)
+	}
+
+	query := "UPDATE sellers SET password = $2 WHERE username = $1"
+	res, err := database.ExecContext(context, query, username, password)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
+}
+
+func GetOtpFromDB(context context.Context, username string) (string, error) {
+	var OTPSecret string
+	var OTPExpiration time.Time
+
+	query := "SELECT otp, otp_expiration FROM sellers WHERE username = $1"
+	err := database.QueryRowContext(context, query, username).Scan(&OTPSecret, &OTPExpiration)
+	if err != nil {
+		return OTPSecret, err
+	}
+
+	if time.Now().After(OTPExpiration) {
+		return "", errors.New(messages.OTPExpiredMessage)
+	}
+
+	return OTPSecret, nil
+}
+
+func SaveOTPAndExpirationInDB(context context.Context, username, otp string, expiration any) error {
+	query := "UPDATE sellers SET otp = $2, otp_expiration = $3 WHERE username = $1"
+	res, err := database.ExecContext(context, query, username, otp, expiration)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
+}
+
 func DeleteSellerByUsername(username string) error {
 	query := "DELETE FROM sellers WHERE username = $1"
 	res, err := database.ExecContext(context.TODO(), query, username)
@@ -91,4 +185,9 @@ func DeleteSellerByUsername(username string) error {
 	}
 
 	return err
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), constants.BcryptHashingCost)
+	return string(bytes), err
 }

@@ -7,7 +7,7 @@ const (
 	SellerAlreadyExistsMessage       = "seller Already exists"
 	InvalidUsernameMessage           = "invalid username"
 	InvalidBodyMessage               = "invalid body"
-	InvalidOTPMessage                = "otp username"
+	InvalidOTPMessage                = "invalid otp"
 	OTPExpiredMessage                = "otp expired"
 	UserNotFoundMessage              = "user not found"
 	SellerNotFoundMessage            = "seller not found"

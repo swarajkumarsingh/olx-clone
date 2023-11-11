@@ -39,6 +39,8 @@ type Seller struct {
 	Rating        string `json:"rating" db:"rating"`
 	AccountStatus string `json:"account_status" db:"account_status"`
 	Created_at    string `json:"created_on" db:"created_at"`
+	OTP           any    `json:"otp" db:"otp"`
+	OTPExpiration any    `json:"otp_expiration" db:"otp_expiration"`
 }
 
 type SellerUpdateStruct struct {
@@ -55,7 +57,17 @@ type SellerUpdateStruct struct {
 	ZipCode     any    `json:"zip_code" db:"zip_code"`
 }
 
+type ResetRequestStruct struct {
+	Username string `validate:"required" json:"username"`
+}
+
 type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims
+}
+
+type ResetPasswordStruct struct {
+	OTP         string `validate:"required" json:"otp"`
+	Username    string `validate:"required" json:"username"`
+	NewPassword string `validate:"required" json:"new_password"`
 }
