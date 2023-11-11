@@ -86,6 +86,21 @@ func GetAllSeller(ctx *gin.Context) {
 	})
 }
 
+// report seller account
+func ReportSellerAccount(ctx *gin.Context) {
+	// get body
+
+	// add report to db
+
+	// if seller report count greater than 10 - suspend account
+
+	// if seller report count greater than 20 - ban account
+
+	// send email to company
+
+	// show response
+}
+
 // get all created products
 func GetAllCreatedProduct(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
@@ -116,7 +131,7 @@ func GetAllCreatedProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"products":       products,
+		"products":    products,
 		"page":        page,
 		"per_page":    itemsPerPage,
 		"total_pages": calculateTotalPages(page, itemsPerPage),
