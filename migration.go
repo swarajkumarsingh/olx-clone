@@ -6,6 +6,7 @@ YYYYMMDDHHMMSSmillseconds_tablename.sql
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -64,7 +65,9 @@ func MigrateDB() {
 	}
 
 	// Sort the list alphabetically
+	fmt.Println("hola files: ", files)
 	sort.Strings(files)
+	fmt.Println("hola2 files: ", files)
 	log.Println("files:", files)
 
 	// get last run migration
