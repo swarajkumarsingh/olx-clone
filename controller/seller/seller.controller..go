@@ -282,29 +282,34 @@ func ReportSeller(ctx *gin.Context) {
 
 }
 
-// un-suspend seller account
-func UnSuspendSeller(ctx *gin.Context) {
-
-}
-
 // ban seller account
 func BanSeller(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
 	username := ctx.Param("username")
-	if err := model.BanSellerAccount(context.TODO(), username); err != nil {
+	if err := model.UpdateSellerAccountStatus(context.TODO(), username, constants.StatusBanSeller); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"error":   false,
-		"message": "seller banned successfully",
+		"message": "seller suspended successfully",
 	})
 }
 
 // ban seller account
-func UnBanSeller(ctx *gin.Context) {
+func ActivateSellerAccount(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	username := ctx.Param("username")
+	if err := model.UpdateSellerAccountStatus(context.TODO(), username, constants.StatusActiveSeller); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "seller suspended successfully",
+	})
 }
 
 // get all created products

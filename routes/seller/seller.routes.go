@@ -11,11 +11,9 @@ func AddRoutes(router *gin.Engine) {
 
 	sellers.POST("/seller/login", seller.LoginSeller)
 
-	sellers.POST("/suspend/seller/:sid", seller.SuspendSeller)
-	sellers.POST("/unsuspend/seller/:sid", seller.UnSuspendSeller)
-
 	sellers.POST("/ban/seller/:sid", seller.BanSeller)
-	sellers.POST("/unban/seller/:sid", seller.UnBanSeller)
+	sellers.POST("/suspend/seller/:sid", seller.SuspendSeller)
+	sellers.POST("/activate/seller/:sid", seller.ActivateSellerAccount)
 
 	sellers.POST("/seller/verify", seller.VerifySeller)
 
