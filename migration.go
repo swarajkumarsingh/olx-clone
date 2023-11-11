@@ -2,11 +2,12 @@
 All migration SQL files reside in scripts folder with following format:
 
 YYYYMMDDHHMMSSmillseconds_tablename.sql
+
+Generate sql file - make gen n="<table_name>"
 */
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -65,9 +66,7 @@ func MigrateDB() {
 	}
 
 	// Sort the list alphabetically
-	fmt.Println("hola files: ", files)
 	sort.Strings(files)
-	fmt.Println("hola2 files: ", files)
 	log.Println("files:", files)
 
 	// get last run migration
