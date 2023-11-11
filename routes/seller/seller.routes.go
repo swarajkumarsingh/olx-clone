@@ -10,7 +10,6 @@ func AddRoutes(router *gin.Engine) {
 	sellers := router.Group("/")
 
 	sellers.POST("/seller/login", seller.LoginSeller)
-	sellers.POST("/seller/logout", seller.LogoutSeller)
 
 	sellers.POST("/suspend/seller/:sid", seller.SuspendSeller)
 	sellers.POST("/unsuspend/seller/:sid", seller.UnSuspendSeller)

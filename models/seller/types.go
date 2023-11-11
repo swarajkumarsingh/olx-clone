@@ -66,6 +66,11 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+type LoginUser struct {
+	Username string `validate:"required" json:"username"`
+	Password string `validate:"required" json:"password"`
+}
+
 type ResetPasswordStruct struct {
 	OTP         string `validate:"required" json:"otp"`
 	Username    string `validate:"required" json:"username"`

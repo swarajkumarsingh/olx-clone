@@ -111,13 +111,38 @@ func CheckIfUsernameExists(context context.Context, username string) (Seller, er
 	return user, nil
 }
 
-
 func ResetOtpAndOtpExpiration(context context.Context, username string) error {
 	_, err := database.ExecContext(context, "UPDATE sellers SET otp = '', otp_expiration = NULL WHERE username = $1", username)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func IsValidUser(context context.Context, username, password string) (Seller, error) {
+	var userModel Seller
+	validUserName := general.ValidUserName(username)
+
+	if !validUserName {
+		return userModel, errors.New(messages.InvalidCredentialsMessage)
+	}
+
+	user, err := GetUserByUsername(context, username)
+	if err != nil {
+		return userModel, err
+	}
+
+	valid := checkPasswordHash(password, user.Password)
+	if !valid {
+		return userModel, errors.New(messages.InvalidCredentialsMessage)
+	}
+
+	return userModel, nil
 }
 
 func UpdatePassword(context context.Context, username, newPassword string) error {

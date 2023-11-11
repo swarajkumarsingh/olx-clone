@@ -111,12 +111,34 @@ func GetSeller(ctx *gin.Context) {
 
 // login
 func LoginSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-}
+	var body model.LoginUser
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidUsernameOrPasswordMessage)
+	}
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidUsernameOrPasswordMessage)
+	}
 
-// logout
-func LogoutSeller(ctx *gin.Context) {
+	_, err := model.IsValidUser(context.TODO(), body.Username, body.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(err)
+	}
 
+	token, err := generateJwtToken(body.Username)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln("unable to login, try again later")
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"error":   false,
+		"message": "Seller login successfully",
+		"token":   token,
+	})
 }
 
 // update
