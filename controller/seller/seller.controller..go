@@ -289,7 +289,17 @@ func UnSuspendSeller(ctx *gin.Context) {
 
 // ban seller account
 func BanSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	username := ctx.Param("username")
+	if err := model.BanSellerAccount(context.TODO(), username); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "seller banned successfully",
+	})
 }
 
 // ban seller account
