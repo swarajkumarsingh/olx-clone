@@ -199,7 +199,47 @@ func RequestResetPassword(ctx *gin.Context) {
 
 // reset password
 func ResetPasswordSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	var body model.ResetPasswordStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	encodedOTP, err := model.GetOtpFromDB(context.TODO(), body.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	otp, err := decodeString(encodedOTP)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	valid := verifyOTPs(body.OTP, otp)
+	if !valid {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidOTPMessage)
+	}
+
+	if err := model.UpdatePassword(context.TODO(), body.Username, body.NewPassword); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	if err := model.ResetOtpAndOtpExpiration(context.TODO(), body.Username); err != nil {
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "Reset password successful",
+	})
 }
 
 // suspend seller account
