@@ -80,3 +80,10 @@ type ResetPasswordStruct struct {
 	Username    string `validate:"required" json:"username"`
 	NewPassword string `validate:"required" json:"new_password"`
 }
+
+type ReportAccountStruct struct {
+	Username string `validate:"required" json:"username"`
+	UserId   string `validate:"required" json:"user_id"`
+	SellerId string `validate:"required" json:"seller_id"`
+	Message  string `validate:"required" json:"message"`
+}

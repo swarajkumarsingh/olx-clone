@@ -10,6 +10,7 @@ func AddRoutes(router *gin.Engine) {
 	sellers := router.Group("/")
 
 	sellers.POST("/seller/login", seller.LoginSeller)
+	sellers.POST("/seller/report", seller.ReportSeller)
 
 	sellers.PATCH("/seller/ban", seller.BanSeller)
 	sellers.PATCH("/seller/suspend", seller.SuspendSeller)

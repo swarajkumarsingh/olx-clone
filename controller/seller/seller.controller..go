@@ -3,6 +3,7 @@ package seller
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"olx-clone/constants"
 	"olx-clone/constants/messages"
@@ -87,18 +88,56 @@ func GetAllSeller(ctx *gin.Context) {
 }
 
 // report seller account
-func ReportSellerAccount(ctx *gin.Context) {
-	// get body
+func ReportSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+	var body model.ReportAccountStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
+	}
 
-	// add report to db
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
+	}
 
-	// if seller report count greater than 10 - suspend account
+	status, err := model.SellerStatus(context.TODO(), body.SellerId)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
+	}
 
-	// if seller report count greater than 20 - ban account
+	if status == constants.StatusBanSeller {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error":   false,
+			"message": "seller already banned",
+		})
+		return
+	}
 
-	// send email to company
+	if err := model.AddReportToDB(context.TODO(), body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
+	}
 
-	// show response
+	count, err := model.GetSellerReportCount(context.TODO(), body)
+	if err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
+	}
+
+	if count > 10 && count < 20 {
+		if err := model.UpdateSellerAccountStatus(context.TODO(), body.Username, constants.StatusSuspendSeller); err != nil {
+			logger.WithRequest(ctx).Errorln("error while suspending account, error: ", err)
+		}
+	} else if count >= 20 {
+		if err := model.UpdateSellerAccountStatus(context.TODO(), body.Username, constants.StatusBanSeller); err != nil {
+			logger.WithRequest(ctx).Errorln("error while banning account, error: ", err)
+		}
+		if err := model.DeleteAllSellerReport(context.TODO(), body.UserId); err != nil {
+			logger.WithRequest(ctx).Errorln("error while deleting account, error: ", err)
+		}
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "report submitted successfully",
+	})
 }
 
 // get all created products

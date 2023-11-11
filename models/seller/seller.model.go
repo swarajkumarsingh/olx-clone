@@ -16,6 +16,34 @@ import (
 
 var database = db.Mgr.DBConn
 
+func AddReportToDB(context context.Context, body ReportAccountStruct) error {
+	query := `INSERT INTO sellers_report(user_id, seller_id, message) VALUES($1, $2, $3)`
+	_, err := database.ExecContext(context, query, body.UserId, body.SellerId, body.Message)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SellerStatus(context context.Context, sid string) (string, error) {
+	seller, err := GetSellerBySellerId(context, sid)
+	if err != nil {
+		return "", err
+	}
+
+	return seller.AccountStatus, nil
+}
+
+func GetSellerReportCount(context context.Context, body ReportAccountStruct) (int, error) {
+	row := database.QueryRowContext(context, "SELECT COUNT(*) FROM sellers_report WHERE seller_id = $1", body.SellerId)
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func CreateSeller(body SellerBody, password string) error {
 	if body.Avatar == "" {
 		query := `INSERT INTO sellers(username, fullname, email, password, phone, location, coordinates, description) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`
@@ -62,6 +90,21 @@ func GetSellerByUsername(context context.Context, username string) (Seller, erro
 
 	query := "SELECT * FROM sellers WHERE username = $1"
 	err := database.GetContext(context, &userModel, query, username)
+	if err == nil {
+		return userModel, nil
+	}
+	return userModel, err
+}
+
+func GetSellerBySellerId(context context.Context, sid string) (Seller, error) {
+	var userModel Seller
+	validUserName := general.ValidUserName(sid)
+	if !validUserName {
+		return userModel, errors.New("invalid username")
+	}
+
+	query := "SELECT * FROM sellers WHERE id = $1"
+	err := database.GetContext(context, &userModel, query, sid)
 	if err == nil {
 		return userModel, nil
 	}
@@ -227,7 +270,22 @@ func DeleteSellerByUsername(username string) error {
 
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected == 0 {
-		return errors.New("user already deleted or user not found")
+		return errors.New("user already deleted or not found")
+	}
+
+	return err
+}
+
+func DeleteAllSellerReport(context context.Context, sid string) error {
+	query := "DELETE FROM sellers_report WHERE seller_id = $1"
+	res, err := database.ExecContext(context, query, sid)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("report already deleted or not found")
 	}
 
 	return err

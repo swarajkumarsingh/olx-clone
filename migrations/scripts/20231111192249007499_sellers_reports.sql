@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS favorites (
+CREATE TABLE IF NOT EXISTS sellers_report (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id),
     seller_id INT REFERENCES sellers(id),
