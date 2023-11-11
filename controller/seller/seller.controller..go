@@ -3,7 +3,6 @@ package seller
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"olx-clone/constants"
 	"olx-clone/constants/messages"
