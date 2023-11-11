@@ -61,6 +61,10 @@ type ResetRequestStruct struct {
 	Username string `validate:"required" json:"username"`
 }
 
+type UpdateAccountStatusStruct struct {
+	Username string `validate:"required" json:"username"`
+}
+
 type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims

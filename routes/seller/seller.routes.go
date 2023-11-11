@@ -11,11 +11,11 @@ func AddRoutes(router *gin.Engine) {
 
 	sellers.POST("/seller/login", seller.LoginSeller)
 
-	sellers.POST("/ban/seller/:sid", seller.BanSeller)
-	sellers.POST("/suspend/seller/:sid", seller.SuspendSeller)
-	sellers.POST("/activate/seller/:sid", seller.ActivateSellerAccount)
+	sellers.PATCH("/seller/ban", seller.BanSeller)
+	sellers.PATCH("/seller/suspend", seller.SuspendSeller)
+	sellers.PATCH("/seller/activate", seller.ActivateSeller)
 
-	sellers.POST("/seller/verify", seller.VerifySeller)
+	sellers.PATCH("/seller/verify", seller.VerifySeller)
 
 	sellers.GET("/seller/products", seller.GetAllCreatedProduct)
 

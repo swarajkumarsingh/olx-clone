@@ -119,16 +119,16 @@ func ResetOtpAndOtpExpiration(context context.Context, username string) error {
 	return nil
 }
 
-func BanSellerAccount(context context.Context, username string) error {
-	_, err := database.ExecContext(context, "UPDATE sellers SET account_status = $2 WHERE username = $1", username, constants.StatusBanSeller)
+func UpdateSellerAccountStatus(context context.Context, username string, status string) error {
+	_, err := database.ExecContext(context, "UPDATE sellers SET account_status = $2 WHERE username = $1", username, status)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateSellerAccountStatus(context context.Context, username string, status string) error {
-	_, err := database.ExecContext(context, "UPDATE sellers SET account_status = $2 WHERE username = $1", username, status)
+func VerifySellerAccount(context context.Context, username string) error {
+	_, err := database.ExecContext(context, "UPDATE sellers SET is_verified = $2 WHERE username = $1", username, true)
 	if err != nil {
 		return err
 	}

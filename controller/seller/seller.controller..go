@@ -267,8 +267,16 @@ func ResetPasswordSeller(ctx *gin.Context) {
 func SuspendSeller(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	username := ctx.Param("username")
-	if err := model.UpdateSellerAccountStatus(context.TODO(), username, constants.StatusSuspendSeller); err != nil {
+	var body model.UpdateAccountStatusStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := model.UpdateSellerAccountStatus(context.TODO(), body.Username, constants.StatusSuspendSeller); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
 	}
 
@@ -276,39 +284,51 @@ func SuspendSeller(ctx *gin.Context) {
 		"error":   false,
 		"message": "seller suspended successfully",
 	})
-}
-
-func ReportSeller(ctx *gin.Context) {
-
 }
 
 // ban seller account
 func BanSeller(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	username := ctx.Param("username")
-	if err := model.UpdateSellerAccountStatus(context.TODO(), username, constants.StatusBanSeller); err != nil {
+	var body model.UpdateAccountStatusStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := model.UpdateSellerAccountStatus(context.TODO(), body.Username, constants.StatusBanSeller); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"error":   false,
-		"message": "seller suspended successfully",
+		"message": "seller baned successfully",
 	})
 }
 
 // ban seller account
-func ActivateSellerAccount(ctx *gin.Context) {
+func ActivateSeller(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	username := ctx.Param("username")
-	if err := model.UpdateSellerAccountStatus(context.TODO(), username, constants.StatusActiveSeller); err != nil {
+	var body model.UpdateAccountStatusStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := model.UpdateSellerAccountStatus(context.TODO(), body.Username, constants.StatusActiveSeller); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"error":   false,
-		"message": "seller suspended successfully",
+		"message": "seller activated successfully",
 	})
 }
 
@@ -319,5 +339,25 @@ func GetAllCreatedProduct(ctx *gin.Context) {
 
 // verify seller account
 func VerifySeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	var body model.UpdateAccountStatusStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
+	}
+
+	if err := model.VerifySellerAccount(context.TODO(), body.Username); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "seller verified successfully",
+	})
 }
