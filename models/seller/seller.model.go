@@ -127,6 +127,11 @@ func UpdateSellerAccountStatus(context context.Context, username string, status 
 	return nil
 }
 
+func GetProductsListPaginatedValue(itemsPerPage, offset int, sid string) (*sql.Rows, error) {
+	query := `SELECT id, title, views, price FROM products  WHERE seller_id = $1 ORDER BY id LIMIT $2 OFFSET $3`
+	return database.Query(query, sid, itemsPerPage, offset)
+}
+
 func VerifySellerAccount(context context.Context, username string) error {
 	_, err := database.ExecContext(context, "UPDATE sellers SET is_verified = $2 WHERE username = $1", username, true)
 	if err != nil {

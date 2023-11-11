@@ -17,8 +17,8 @@ func AddRoutes(router *gin.Engine) {
 
 	sellers.PATCH("/seller/verify", seller.VerifySeller)
 
-	sellers.GET("/seller/products", seller.GetAllCreatedProduct)
-
+	sellers.GET("/seller/products/:sid", seller.GetAllCreatedProduct)
+	
 	sellers.POST("/seller", seller.CreateSeller)
 	sellers.GET("/sellers", seller.GetAllSeller)
 	sellers.GET("/seller/:sid", seller.GetSeller)

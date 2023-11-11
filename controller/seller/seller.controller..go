@@ -86,6 +86,43 @@ func GetAllSeller(ctx *gin.Context) {
 	})
 }
 
+// get all created products
+func GetAllCreatedProduct(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	sid := ctx.Param("sid")
+	page := getCurrentPageValue(ctx)
+	itemsPerPage := getItemPerPageValue(ctx)
+	offset := getOffsetValue(page, itemsPerPage)
+
+	rows, err := model.GetProductsListPaginatedValue(itemsPerPage, offset, sid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.ProductNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveProductsMessage)
+	}
+	defer rows.Close()
+
+	products := make([]gin.H, 0)
+
+	for rows.Next() {
+		var id int
+		var title, views, price string
+		if err := rows.Scan(&id, &title, &views, &price); err != nil {
+			logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveProductsMessage)
+		}
+		products = append(products, gin.H{"id": id, "title": title, "views": views, "price": price})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"products":       products,
+		"page":        page,
+		"per_page":    itemsPerPage,
+		"total_pages": calculateTotalPages(page, itemsPerPage),
+	})
+}
+
 // get user
 func GetSeller(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
@@ -330,11 +367,6 @@ func ActivateSeller(ctx *gin.Context) {
 		"error":   false,
 		"message": "seller activated successfully",
 	})
-}
-
-// get all created products
-func GetAllCreatedProduct(ctx *gin.Context) {
-
 }
 
 // verify seller account
