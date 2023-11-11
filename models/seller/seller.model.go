@@ -119,6 +119,22 @@ func ResetOtpAndOtpExpiration(context context.Context, username string) error {
 	return nil
 }
 
+func BanSellerAccount(context context.Context, username string) error {
+	_, err := database.ExecContext(context, "UPDATE sellers SET account_status = $2 WHERE username = $1", username, constants.StatusBanSeller)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateSellerAccountStatus(context context.Context, username string, status string) error {
+	_, err := database.ExecContext(context, "UPDATE sellers SET account_status = $2 WHERE username = $1", username, status)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil

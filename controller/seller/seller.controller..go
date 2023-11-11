@@ -168,8 +168,7 @@ func DeleteSeller(ctx *gin.Context) {
 
 	username := ctx.Param("sid")
 	if username == "" {
-		errorHandler.CustomError(ctx, http.StatusBadRequest, messages.InvalidUsernameMessage)
-		return
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidUsernameMessage)
 	}
 
 	if err := model.DeleteSellerByUsername(username); err != nil {
@@ -266,6 +265,20 @@ func ResetPasswordSeller(ctx *gin.Context) {
 
 // suspend seller account
 func SuspendSeller(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	username := ctx.Param("username")
+	if err := model.UpdateSellerAccountStatus(context.TODO(), username, constants.StatusSuspendSeller); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"message": "seller suspended successfully",
+	})
+}
+
+func ReportSeller(ctx *gin.Context) {
 
 }
 

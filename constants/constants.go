@@ -17,3 +17,7 @@ const DefaultSenderEmailId = "swaraj.singh.wearingo@gmail.com"
 const DefaultRecipientEmailId = "swaraj.singh.wearingo@gmail.com"
 
 const OtpAESEncryptKey = "fjnsfjsdnfjs"
+
+const StatusBanSeller = "ban"
+const StatusActiveSeller = "active"
+const StatusSuspendSeller = "suspend"
