@@ -14,3 +14,9 @@ type Review struct {
 	Comment   string `json:"comment" db:"comment"`
 	CreatedAt string `json:"created_at" db:"created_at"`
 }
+
+type UpdateReviewStruct struct {
+	Rating   string `validate:"required" json:"rating"`
+	Comment  string `validate:"required" json:"comment"`
+	ReviewId string `validate:"required" json:"review_id"`
+}

@@ -2,6 +2,7 @@ package reviewModel
 
 import (
 	"context"
+	"errors"
 	"olx-clone/infra/db"
 )
 
@@ -24,4 +25,19 @@ func GetReview(context context.Context, rid string) (Review, error) {
 		return review, nil
 	}
 	return review, err
+}
+
+func UpdateReview(context context.Context, reviewId, rating, comment string) error {
+	query := "UPDATE reviews SET rating = $2, comment = $3 WHERE id = $1"
+	res, err := database.ExecContext(context, query, reviewId, rating, comment)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		return errors.New("could not update user")
+	}
+
+	return nil
 }

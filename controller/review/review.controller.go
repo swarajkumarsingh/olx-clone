@@ -57,9 +57,22 @@ func GetReview(ctx *gin.Context) {
 func UpdateReview(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	var body model.UpdateReviewStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
+	}
+
+	if err := general.ValidateStruct(body); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
+	}
+
+	if err := model.UpdateReview(context.TODO(), body.ReviewId, body.Rating, body.Comment); err != nil {
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
+	}
+
 	ctx.JSON(http.StatusCreated, gin.H{
 		"error":   false,
-		"message": "added to favorites successfully",
+		"message": "updated favorites successfully",
 	})
 }
 
