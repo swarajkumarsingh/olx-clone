@@ -15,3 +15,13 @@ func AddReview(context context.Context, userId, productId, rating, comment strin
 	}
 	return nil
 }
+
+func GetReview(context context.Context, rid string) (Review, error) {
+	var review Review
+	query := "SELECT * FROM reviews WHERE id = $1"
+	err := database.GetContext(context, &review, query, rid)
+	if err == nil {
+		return review, nil
+	}
+	return review, err
+}

@@ -2,6 +2,7 @@ package review
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
@@ -37,9 +38,19 @@ func CreateReview(ctx *gin.Context) {
 func GetReview(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
+	rid := ctx.Param("rid")
+
+	review, err := model.GetReview(context.TODO(), rid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.ReviewNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, err)
+	}
+
 	ctx.JSON(http.StatusCreated, gin.H{
-		"error":   false,
-		"review": "",
+		"error":  false,
+		"review": review,
 	})
 }
 

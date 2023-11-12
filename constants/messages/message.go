@@ -13,6 +13,7 @@ const (
 	UserNotFoundMessage              = "user not found"
 	SellerNotFoundMessage            = "seller not found"
 	UserViewedProductNotFoundMessage = "empty products views"
+	ReviewNotFoundMessage            = "review not found"
 	ProductNotFoundMessage           = "product not found"
 	FailedToRetrieveProductsMessage  = "failed to retrieve products"
 	FailedToSendEmailMessage         = "failed to send email"
