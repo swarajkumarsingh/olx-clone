@@ -2,6 +2,7 @@ package reviewModel
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"olx-clone/infra/db"
 )
@@ -40,4 +41,24 @@ func UpdateReview(context context.Context, reviewId, rating, comment string) err
 	}
 
 	return nil
+}
+
+func DeleteReview(context context.Context, rid string) error {
+	query := "DELETE FROM reviews WHERE id = $1"
+	res, err := database.ExecContext(context, query, rid)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("review already deleted or not found")
+	}
+
+	return err
+}
+
+func GetProductReviews(context context.Context, pid string, itemsPerPage, offset int) (*sql.Rows, error) {
+	query := `SELECT id, product_id, rating, comment FROM reviews WHERE product_id = $1 ORDER BY id LIMIT $2 OFFSET $3`
+	return database.QueryContext(context, query, pid, itemsPerPage, offset)
 }
