@@ -10,6 +10,7 @@ import (
 	"olx-clone/functions/logger"
 	favoriteRoutes "olx-clone/routes/favorite"
 	productRoutes "olx-clone/routes/product"
+	reviewRoutes "olx-clone/routes/review"
 	sellerRoutes "olx-clone/routes/seller"
 	userRoutes "olx-clone/routes/user"
 )
@@ -87,9 +88,10 @@ func main() {
 	r.GET("/metrics", prometheusHandler())
 
 	userRoutes.AddRoutes(r)
+	sellerRoutes.AddRoutes(r)
+	reviewRoutes.AddRoutes(r)
 	productRoutes.AddRoutes(r)
 	favoriteRoutes.AddRoutes(r)
-	sellerRoutes.AddRoutes(r)
 
 	log.Printf("Server Started, version: %s", version)
 	http.ListenAndServe(":8080", r)
