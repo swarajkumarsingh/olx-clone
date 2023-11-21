@@ -3,9 +3,10 @@ package product
 import (
 	"errors"
 	"olx-clone/constants"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
+	validators "olx-clone/functions/validator"
 	model "olx-clone/models/product"
+
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func getCreateProductBody(ctx *gin.Context) (model.CreateProductBody, error) {
 		return body, errors.New("invalid body")
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		return body, err
 	}
 

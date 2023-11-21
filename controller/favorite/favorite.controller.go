@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
+	validators "olx-clone/functions/validator"
 	model "olx-clone/models/favorite"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ func AddFavorite(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 

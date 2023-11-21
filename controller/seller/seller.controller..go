@@ -7,8 +7,8 @@ import (
 	"olx-clone/constants"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
+	validators "olx-clone/functions/validator"
 	model "olx-clone/models/seller"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func CreateSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
@@ -94,7 +94,7 @@ func ReportSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
@@ -207,7 +207,7 @@ func LoginSeller(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidUsernameOrPasswordMessage)
 	}
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidUsernameOrPasswordMessage)
 	}
 
@@ -277,7 +277,7 @@ func RequestResetPassword(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
@@ -317,7 +317,7 @@ func ResetPasswordSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
@@ -362,7 +362,7 @@ func SuspendSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
@@ -385,7 +385,7 @@ func BanSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
@@ -408,7 +408,7 @@ func ActivateSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
@@ -433,7 +433,7 @@ func VerifySeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(messages.InvalidBodyMessage)
 	}
 

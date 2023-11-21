@@ -16,6 +16,7 @@ import (
 
 	ses "olx-clone/infra/ses"
 
+	validators "olx-clone/functions/validator"
 	sesService "github.com/aws/aws-sdk-go/service/ses"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -162,7 +163,7 @@ func getCreateUserBody(ctx *gin.Context) (model.UserBody, error) {
 		return body, errors.New(messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		return body, err
 	}
 	return body, nil
@@ -181,7 +182,7 @@ func getResetPasswordCredentialsFromBody(ctx *gin.Context) (model.ResetPasswordS
 	if err := ctx.ShouldBindJSON(&model); err != nil {
 		return model, errors.New("invalid body")
 	}
-	if err := general.ValidateStruct(model); err != nil {
+	if err := validators.ValidateStruct(model); err != nil {
 		return model, err
 	}
 	return model, nil
@@ -192,7 +193,7 @@ func getResetRequestCredentialsFromBody(ctx *gin.Context) (model.ResetRequestStr
 	if err := ctx.ShouldBindJSON(&model); err != nil {
 		return model, errors.New("invalid body")
 	}
-	if err := general.ValidateStruct(model); err != nil {
+	if err := validators.ValidateStruct(model); err != nil {
 		return model, err
 	}
 	return model, nil

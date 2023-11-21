@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/review"
+		validators "olx-clone/functions/validator"
+
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ func CreateReview(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
@@ -62,7 +63,7 @@ func UpdateReview(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidBodyMessage)
 	}
 
-	if err := general.ValidateStruct(body); err != nil {
+	if err := validators.ValidateStruct(body); err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 

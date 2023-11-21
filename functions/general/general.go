@@ -35,7 +35,7 @@ import (
 var log = logger.Log
 
 // ValidateStruct validates the struct and return error if they occur
-func ValidateStruct(s interface{}) error {
+func DeprecatedValidateStruct(s interface{}) error {
 	v := validator.New()
 	err := v.Struct(s)
 

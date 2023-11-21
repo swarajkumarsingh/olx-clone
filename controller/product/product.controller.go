@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"olx-clone/constants/messages"
 	"olx-clone/errorHandler"
-	"olx-clone/functions/general"
 	"olx-clone/functions/logger"
+	validators "olx-clone/functions/validator"
 	model "olx-clone/models/product"
 
 	"github.com/gin-gonic/gin"
@@ -103,7 +103,7 @@ func UpdateProduct(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	err = general.ValidateStruct(body)
+	err = validators.ValidateStruct(body)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}

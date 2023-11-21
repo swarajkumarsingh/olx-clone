@@ -38,14 +38,12 @@ func Authorize(ctx *gin.Context) {
 		return
 	}
 
-	// Check if the token is valid
 	if !token.Valid {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token is not valid"})
 		ctx.Abort()
 		return
 	}
 
-	// Access the username from the token claims
 	claims, ok := token.Claims.(*userModel.Claims)
 	if !ok {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
@@ -53,9 +51,11 @@ func Authorize(ctx *gin.Context) {
 		return
 	}
 
-	// Save the username in the request context
+	// check if the user exists
+	// check user role(user, seller, admin)
+	// if seller account, check if the account is not suspended
+
 	ctx.Set("username", claims.Username)
 
-	// Continue processing the request
 	ctx.Next()
 }
