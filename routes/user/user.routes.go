@@ -10,6 +10,7 @@ import (
 func AddRoutes(router *gin.Engine) {
 	users := router.Group("/")
 
+	users.GET("/test", authentication.AuthorizeUser, user.Test)
 	users.POST("/login", user.LoginUser)
 
 	users.POST("/request/password", user.RequestResetPassword)
@@ -19,7 +20,7 @@ func AddRoutes(router *gin.Engine) {
 
 	users.POST("/user", user.CreateUser)
 	users.GET("/users", user.GetUsers)
-	users.GET("/user/:username", authentication.Authorize, user.GetUser)
+	users.GET("/user/:username", authentication.AuthorizeUser, user.GetUser)
 	users.PATCH("/user/:username", user.UpdateUser)
 	users.DELETE("/user/:username", user.DeleteUser)
 

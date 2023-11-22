@@ -34,6 +34,7 @@ func IsEmpty(value interface{}) bool {
 		return true
 	}
 
+	// Check for common types
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.String:
 		return value.(string) == ""
@@ -41,7 +42,12 @@ func IsEmpty(value interface{}) bool {
 		return reflect.ValueOf(value).Len() == 0
 	case reflect.Ptr:
 		return reflect.ValueOf(value).IsNil()
+	case reflect.Interface:
+		return reflect.ValueOf(value).IsNil()
+	case reflect.Func:
+		return reflect.ValueOf(value).IsNil()
 	default:
+		// Add more cases as needed
 		return false
 	}
 }

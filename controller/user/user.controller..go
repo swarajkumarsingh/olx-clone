@@ -134,6 +134,14 @@ func LoginUser(ctx *gin.Context) {
 	})
 }
 
+// test
+func Test(ctx *gin.Context) {
+	ctx.JSON(http.StatusCreated, gin.H{
+		"error":   false,
+		"message": "come home sugar daddy",
+	})
+}
+
 // update
 func UpdateUser(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)

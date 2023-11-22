@@ -1,5 +1,14 @@
+test middlewares
+add all middleware
 category controller
-add middleware
+
 admin controller
+    - total sales
+    - total users
+    - active users
+    - total products
+    - total sellers
+    - total sales
+
 seller dashboard
 chat feature

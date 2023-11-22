@@ -27,7 +27,7 @@ func CreateSeller(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, err)
 	}
 
-	if model.SellerAlreadyExistsWithUsername(body.Username) {
+	if model.SellerAlreadyExistsWithUsername(body.Username) { 
 		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.SellerAlreadyExistsMessage)
 	}
 

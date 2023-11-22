@@ -8,11 +8,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"olx-clone/functions/logger"
-	favoriteRoutes "olx-clone/routes/favorite"
-	productRoutes "olx-clone/routes/product"
+	userRoutes "olx-clone/routes/user"
 	reviewRoutes "olx-clone/routes/review"
 	sellerRoutes "olx-clone/routes/seller"
-	userRoutes "olx-clone/routes/user"
+	productRoutes "olx-clone/routes/product"
+	favoriteRoutes "olx-clone/routes/favorite"
 )
 
 var log = logger.Log

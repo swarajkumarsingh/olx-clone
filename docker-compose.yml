@@ -47,9 +47,8 @@ services:
       - postgres
     # For Dockerfile.Local only
     volumes:
-      - ./:/app
+      - ./:/var/lib/postgresql/data/
 
 volumes:
   redis: {}
-  db:
-    driver: local
+  db: {}
