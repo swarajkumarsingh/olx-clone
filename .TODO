@@ -2,6 +2,8 @@ test middlewares
 add all middleware
 category controller
 
+GetProduct controller - userId/username
+
 admin controller
     - total sales
     - total users

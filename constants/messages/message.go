@@ -18,5 +18,6 @@ const (
 	FailedToRetrieveProductsMessage  = "failed to retrieve products"
 	FailedToSendEmailMessage         = "failed to send email"
 	FailedToRetrieveUsersMessage     = "failed to retrieve users"
+	FailedToRetrieveFavoritesMessage     = "failed to retrieve favorites"
 	FailedToRetrieveSellersMessage   = "failed to retrieve sellers"
 )

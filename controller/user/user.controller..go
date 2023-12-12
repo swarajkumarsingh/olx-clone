@@ -122,7 +122,6 @@ func LoginUser(ctx *gin.Context) {
 	}
 
 	token, err := generateJwtToken(username)
-
 	if err != nil {
 		logger.WithRequest(ctx).Panicln("unable to login, try again later")
 	}

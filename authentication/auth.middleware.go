@@ -36,14 +36,8 @@ func AuthorizeUser(ctx *gin.Context) {
 		return conf.JWTSecretKey, nil
 	})
 
-	if err != nil {
+	if err != nil || !token.Valid {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-		ctx.Abort()
-		return
-	}
-
-	if !token.Valid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token is not valid"})
 		ctx.Abort()
 		return
 	}
