@@ -23,5 +23,4 @@ const StatusActiveSeller = "active"
 const StatusSuspendSeller = "suspend"
 
 const UserIdMiddlewareConstant = "userId"
-const UsernameMiddlewareConstant = "username"
 const SellerIdMiddlewareConstant = "sellerId"

@@ -6,6 +6,7 @@ const (
 	UserAlreadyExistsMessage         = "user Already exists"
 	SellerAlreadyExistsMessage       = "seller Already exists"
 	InvalidUsernameMessage           = "invalid username"
+	InvalidUserIdMessage             = "invalid userId"
 	InvalidUsernameOrPasswordMessage = "invalid username or password"
 	InvalidBodyMessage               = "invalid body"
 	InvalidOTPMessage                = "invalid otp"
@@ -18,6 +19,6 @@ const (
 	FailedToRetrieveProductsMessage  = "failed to retrieve products"
 	FailedToSendEmailMessage         = "failed to send email"
 	FailedToRetrieveUsersMessage     = "failed to retrieve users"
-	FailedToRetrieveFavoritesMessage     = "failed to retrieve favorites"
+	FailedToRetrieveFavoritesMessage = "failed to retrieve favorites"
 	FailedToRetrieveSellersMessage   = "failed to retrieve sellers"
 )

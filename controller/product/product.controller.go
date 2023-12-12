@@ -36,8 +36,12 @@ func CreateProduct(ctx *gin.Context) {
 func GetProduct(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	productId := getProductIdFromParams(ctx)
+	userId, valid := getUserIdFromReq(ctx)
+	if !valid {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidUserIdMessage)
+	}
 
+	productId := getProductIdFromParams(ctx)
 	product, err := model.GetProduct(context.TODO(), productId)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -47,12 +51,9 @@ func GetProduct(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	userId, valid := getUserIdFromReq(ctx)
-	if valid {
-		err = model.AddProductViews(context.TODO(), userId, productId)
-		if err != nil {
-			logger.WithRequest(ctx).Errorln(err)
-		}
+	err = model.AddProductViews(context.TODO(), userId, productId)
+	if err != nil {
+		logger.WithRequest(ctx).Errorln(err)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{

@@ -20,9 +20,9 @@ func AddRoutes(router *gin.Engine) {
 
 	users.POST("/user", user.CreateUser)
 	users.GET("/users", user.GetUsers)
-	users.GET("/user/:username", authentication.AuthorizeUser, user.GetUser)
+	users.GET("/user/:username", user.GetUser)
 	users.PATCH("/user/:username", user.UpdateUser)
 	users.DELETE("/user/:username", user.DeleteUser)
 
-	users.GET("/user/viewed", user.ViewedProducts)
+	users.GET("/user/viewed", authentication.AuthorizeUser, user.ViewedProducts)
 }

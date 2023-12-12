@@ -81,6 +81,21 @@ func GetUserByUsername(context context.Context, username string) (User, error) {
 	return userModel, err
 }
 
+func GetUserByUsernameWithUserId(context context.Context, userId string) (User, error) {
+	var userModel User
+	validUserName := general.ValidUserName(userId)
+	if !validUserName {
+		return userModel, errors.New("invalid username")
+	}
+
+	query := "SELECT * FROM users WHERE id = $1"
+	err := database.GetContext(context, &userModel, query, userId)
+	if err == nil {
+		return userModel, nil
+	}
+	return userModel, err
+}
+
 func SaveOTPAndExpirationInDB(context context.Context, username, otp string, expiration any) error {
 	query := "UPDATE users SET otp = $2, otp_expiration = $3 WHERE username = $1"
 	res, err := database.ExecContext(context, query, username, otp, expiration)
@@ -114,6 +129,19 @@ func UpdateUser(context context.Context, username string, body UserUpdateBody) e
 func CheckIfUsernameExists(context context.Context, username string) (User, error) {
 	var user User
 	user, err := GetUserByUsername(context, username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New(messages.UserNotFoundMessage)
+		}
+		return user, err
+	}
+
+	return user, nil
+}
+
+func CheckIfUsernameExistsWithId(context context.Context, userId string) (User, error) {
+	var user User
+	user, err := GetUserByUsernameWithUserId(context, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return user, errors.New(messages.UserNotFoundMessage)
@@ -215,6 +243,12 @@ func InsertUser(body UserBody, password string) error {
 func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
 	query := `SELECT id, username, email, phone FROM users ORDER BY id LIMIT $1 OFFSET $2`
 	return database.Query(query, itemsPerPage, offset)
+}
+
+func GetViewedProductsListPaginatedValue(userId string, itemsPerPage, offset int) (*sql.Rows, error) {
+	// query := `SELECT id, username, email, phone FROM users ORDER BY id LIMIT $1 OFFSET $2`
+	query2 := `SELECT id, user_id, product_id FROM product_views WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3`
+	return database.Query(query2, userId, itemsPerPage, offset)
 }
 
 func hashPassword(password string) (string, error) {

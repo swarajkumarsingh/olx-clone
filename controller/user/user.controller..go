@@ -9,6 +9,7 @@ import (
 	"olx-clone/errorHandler"
 	"olx-clone/functions/logger"
 	model "olx-clone/models/user"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +35,19 @@ func CreateUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	token, err := generateJwtToken(body.Username)
+	user, err := model.GetUserByUsername(context.TODO(), body.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	token, err := generateJwtToken(strconv.Itoa(user.Id))
+	if err != nil {
+		logger.WithRequest(ctx).Panicln("unable to login, try again later")
+	}
+
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(err)
 	}
@@ -113,7 +126,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	_, err = model.IsValidUser(context.TODO(), username, password)
+	user, err := model.IsValidUser(context.TODO(), username, password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserNotFoundMessage)
@@ -121,7 +134,7 @@ func LoginUser(ctx *gin.Context) {
 		logger.WithRequest(ctx).Panicln(err)
 	}
 
-	token, err := generateJwtToken(username)
+	token, err := generateJwtToken(strconv.Itoa(user.Id))
 	if err != nil {
 		logger.WithRequest(ctx).Panicln("unable to login, try again later")
 	}
@@ -304,18 +317,34 @@ func ChangePhoneNumber(ctx *gin.Context) {
 func ViewedProducts(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	userId, _ := getUserIdFromReq(ctx)
+	page := getCurrentPageValue(ctx)
+	itemsPerPage := getItemPerPageValue(ctx)
+	offset := getOffsetValue(page, itemsPerPage)
 
-	data, err := model.GetViewedProducts(userId)
+	userId, valid := getUserIdFromReq(ctx)
+	if !valid {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidUserIdMessage)
+	}
+
+	rows, err := model.GetViewedProductsListPaginatedValue(userId, itemsPerPage, offset)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.UserViewedProductNotFoundMessage)
+		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
+	}
+	defer rows.Close()
+
+	users := make([]gin.H, 0)
+	for rows.Next() {
+		var id, userId, productId int
+		if err := rows.Scan(&id, &userId, &productId); err != nil {
+			logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveUsersMessage)
 		}
-		logger.WithRequest(ctx).Panicln(http.StatusInternalServerError, messages.SomethingWentWrongMessage)
+		users = append(users, gin.H{"id": id, "userId": userId, "productId": productId})
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"error":    false,
-		"products": data,
+		"users":       users,
+		"page":        page,
+		"per_page":    itemsPerPage,
+		"total_pages": calculateTotalPages(page, itemsPerPage),
 	})
 }

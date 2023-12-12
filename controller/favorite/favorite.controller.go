@@ -55,7 +55,11 @@ func DeleteFavorite(ctx *gin.Context) {
 func GetAllUsersFavorite(ctx *gin.Context) {
 	defer errorHandler.Recovery(ctx, http.StatusConflict)
 
-	userId, _ := getUserIdFromReq(ctx)
+	userId, valid := getUserIdFromReq(ctx)
+	if !valid {
+		logger.WithRequest(ctx).Panicln(http.StatusBadRequest, messages.InvalidUserIdMessage)
+	}
+	
 	page := getCurrentPageValue(ctx)
 	itemsPerPage := getItemPerPageValue(ctx)
 	offset := getOffsetValue(page, itemsPerPage)

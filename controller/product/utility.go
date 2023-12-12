@@ -2,6 +2,8 @@ package product
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"olx-clone/constants"
 	"olx-clone/functions/logger"
 	validators "olx-clone/functions/validator"
@@ -37,9 +39,15 @@ func getCreateProductBody(ctx *gin.Context) (model.CreateProductBody, error) {
 	return body, nil
 }
 
-// TODO: Get userId from req.userId
 func getUserIdFromReq(ctx *gin.Context) (string, bool) {
-	return "1", true
+	uid, valid := ctx.Get(constants.UserIdMiddlewareConstant)
+	if !valid || uid == nil || fmt.Sprintf("%v", uid) == "" {
+		return "", false
+	}
+
+	log.Println(valid)
+	log.Println(uid)
+	return fmt.Sprintf("%v", uid), true
 }
 
 func getCurrentPageValue(ctx *gin.Context) int {

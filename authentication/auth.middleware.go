@@ -3,8 +3,10 @@ package authentication
 import (
 	"context"
 	"database/sql"
+	"log"
 	"net/http"
 	"olx-clone/conf"
+	"olx-clone/constants"
 	"olx-clone/constants/messages"
 	sellerModel "olx-clone/models/seller"
 	userModel "olx-clone/models/user"
@@ -49,10 +51,10 @@ func AuthorizeUser(ctx *gin.Context) {
 		return
 	}
 
-	username := claims.Username
+	userId := claims.UserId
 
 	// check if the user exists
-	_, err = userModel.CheckIfUsernameExists(context.TODO(), username)
+	_, err = userModel.CheckIfUsernameExistsWithId(context.TODO(), userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
@@ -64,8 +66,9 @@ func AuthorizeUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set("username", claims.Username)
+	log.Println( " 1" ,userId)
 
+	ctx.Set(constants.UserIdMiddlewareConstant, userId)
 	ctx.Next()
 }
 
@@ -110,10 +113,10 @@ func AuthorizeSeller(ctx *gin.Context) {
 		return
 	}
 
-	username := claims.Username
+	userId := claims.UserId
 
 	// check if the user exists
-	_, err = sellerModel.CheckIfUsernameExists(context.TODO(), username)
+	_, err = sellerModel.CheckIfUsernameExistsWithId(context.TODO(), userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": messages.SellerNotFoundMessage})
@@ -125,6 +128,6 @@ func AuthorizeSeller(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set("username", claims.Username)
+	ctx.Set(constants.SellerIdMiddlewareConstant, claims.UserId)
 	ctx.Next()
 }

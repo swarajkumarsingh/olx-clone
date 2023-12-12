@@ -1,6 +1,7 @@
 package favorite
 
 import (
+	"fmt"
 	"olx-clone/constants"
 	"olx-clone/functions/logger"
 	"strconv"
@@ -8,9 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TODO: Get userId from req.userId
 func getUserIdFromReq(ctx *gin.Context) (string, bool) {
-	return "1", true
+	uid, valid := ctx.Get(constants.UserIdMiddlewareConstant)
+	if !valid || uid == nil || fmt.Sprintf("%v", uid) == "" {
+		return "", false
+	}
+
+	return fmt.Sprintf("%v", uid), true
 }
 
 func getCurrentPageValue(ctx *gin.Context) int {

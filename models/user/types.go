@@ -61,6 +61,6 @@ type ResetRequestStruct struct {
 }
 
 type Claims struct {
-	Username string `json:"username"`
+	UserId string `json:"userId"`
 	jwt.RegisteredClaims
 }

@@ -17,15 +17,20 @@ import (
 	ses "olx-clone/infra/ses"
 
 	validators "olx-clone/functions/validator"
+
 	sesService "github.com/aws/aws-sdk-go/service/ses"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// TODO: Get userId from req.userId
 func getUserIdFromReq(ctx *gin.Context) (string, bool) {
-	return "1", true
+	uid, valid := ctx.Get(constants.UserIdMiddlewareConstant)
+	if !valid || uid == nil ||  fmt.Sprintf("%v", uid) == "" {
+		return "", false
+	}
+
+	return fmt.Sprintf("%v", uid), true
 }
 
 func verifyOTPs(bodyOtp, dbOtp string) bool {
@@ -224,10 +229,10 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func generateJwtToken(name string) (string, error) {
+func generateJwtToken(userId string) (string, error) {
 	expirationTime := time.Now().Add(5 * 24 * time.Hour)
 	claims := &model.Claims{
-		Username: name,
+		UserId: userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},

@@ -141,9 +141,37 @@ func GetUserByUsername(context context.Context, username string) (Seller, error)
 	return userModel, err
 }
 
+func GetUserByUsernameWithId(context context.Context, userId string) (Seller, error) {
+	var userModel Seller
+	validUserName := general.ValidUserName(userId)
+	if !validUserName {
+		return userModel, errors.New("invalid username")
+	}
+
+	query := "SELECT * FROM sellers WHERE id = $1"
+	err := database.GetContext(context, &userModel, query, userId)
+	if err == nil {
+		return userModel, nil
+	}
+	return userModel, err
+}
+
 func CheckIfUsernameExists(context context.Context, username string) (Seller, error) {
 	var user Seller
 	user, err := GetUserByUsername(context, username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New(messages.UserNotFoundMessage)
+		}
+		return user, err
+	}
+
+	return user, nil
+}
+
+func CheckIfUsernameExistsWithId(context context.Context, userId string) (Seller, error) {
+	var user Seller
+	user, err := GetUserByUsernameWithId(context, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return user, errors.New(messages.UserNotFoundMessage)
