@@ -31,7 +31,7 @@ func AddFavorite(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"error":   false,
-		"message": "added to favorites successfully",
+		"message": "Added to favorites successfully",
 	})
 }
 
