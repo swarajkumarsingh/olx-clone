@@ -3,7 +3,7 @@ package authentication
 import (
 	"context"
 	"database/sql"
-	"log"
+	"fmt"
 	"net/http"
 	"olx-clone/conf"
 	"olx-clone/constants"
@@ -19,7 +19,7 @@ import (
 func AuthorizeUser(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	if authHeader == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Authorization header is missing"})
 		ctx.Abort()
 		return
 	}
@@ -27,7 +27,7 @@ func AuthorizeUser(ctx *gin.Context) {
 	// Token format: Bearer <token>
 	splitToken := strings.Split(authHeader, " ")
 	if len(splitToken) != 2 || strings.ToLower(splitToken[0]) != "bearer" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token format"})
 		ctx.Abort()
 		return
 	}
@@ -39,14 +39,14 @@ func AuthorizeUser(ctx *gin.Context) {
 	})
 
 	if err != nil || !token.Valid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token"})
 		ctx.Abort()
 		return
 	}
 
 	claims, ok := token.Claims.(*userModel.Claims)
 	if !ok {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token claims"})
 		ctx.Abort()
 		return
 	}
@@ -57,16 +57,15 @@ func AuthorizeUser(ctx *gin.Context) {
 	_, err = userModel.CheckIfUsernameExistsWithId(context.TODO(), userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token claims 2"})
 			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+		fmt.Println(userId, claims.ID, err)
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token claims 3"})
 		ctx.Abort()
 		return
 	}
-
-	log.Println( " 1" ,userId)
 
 	ctx.Set(constants.UserIdMiddlewareConstant, userId)
 	ctx.Next()
@@ -75,7 +74,7 @@ func AuthorizeUser(ctx *gin.Context) {
 func AuthorizeSeller(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	if authHeader == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Authorization header is missing"})
 		ctx.Abort()
 		return
 	}
@@ -83,7 +82,7 @@ func AuthorizeSeller(ctx *gin.Context) {
 	// Token format: Bearer <token>
 	splitToken := strings.Split(authHeader, " ")
 	if len(splitToken) != 2 || strings.ToLower(splitToken[0]) != "bearer" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token format"})
 		ctx.Abort()
 		return
 	}
@@ -95,20 +94,20 @@ func AuthorizeSeller(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token"})
 		ctx.Abort()
 		return
 	}
 
 	if !token.Valid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token is not valid"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token"})
 		ctx.Abort()
 		return
 	}
 
 	claims, ok := token.Claims.(*userModel.Claims)
 	if !ok {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": true, "message": "Invalid token claims"})
 		ctx.Abort()
 		return
 	}

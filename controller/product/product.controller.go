@@ -87,7 +87,7 @@ func GetProducts(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"users":       products,
+		"products":       products,
 		"page":        page,
 		"per_page":    itemsPerPage,
 		"total_pages": calculateTotalPages(page, itemsPerPage),
