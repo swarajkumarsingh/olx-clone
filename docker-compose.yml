@@ -9,6 +9,24 @@ services:
     restart: on-failure
     volumes:
       - .cache:/data
+  
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    restart: on-failure
+    volumes:
+      - ./prometheus.yml:/ect/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: on-failure
+    volumes:
+      - grafana-storage:/var/lib/grafana
 
   postgres:
     build: ./postgres/.
@@ -44,12 +62,15 @@ services:
     restart: on-failure
     depends_on:
       - redis
+      - grafana
       - postgres
+      - prometheus
     # For Dockerfile.Local only
     volumes:
       - ./:/app
 
 volumes:
   redis: {}
+  grafana-storage: {}
   db:
     driver: local
