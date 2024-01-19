@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   redis:
@@ -9,7 +9,7 @@ services:
     restart: on-failure
     volumes:
       - .cache:/data
-  
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -17,7 +17,7 @@ services:
       - 9090:9090
     restart: on-failure
     volumes:
-      - ./prometheus.yml:/ect/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana-enterprise
@@ -38,7 +38,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     hostname: localhost
-    
+
   golang:
     container_name: golang_container
     build:
