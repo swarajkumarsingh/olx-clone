@@ -13,6 +13,7 @@ func AddRoutes(router *gin.Engine) {
 	products.POST("/product", product.CreateProduct)
 	products.GET("/products",  product.GetProducts)
 	products.GET("/product/:pid",authentication.AuthorizeUser, product.GetProduct)
+	products.GET("/product/:pid/views", product.GetProductViews)
 	products.PATCH("/product/:pid", product.UpdateProduct)
 	products.DELETE("/product/:pid", product.DeleteProduct)
 }

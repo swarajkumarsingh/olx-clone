@@ -6,3 +6,6 @@ db
 run.sh
 .vscode
 aws.go
+postgres-data
+pgadmin
+pgadmin-servers.json

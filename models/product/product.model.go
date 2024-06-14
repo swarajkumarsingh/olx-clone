@@ -77,9 +77,14 @@ func DeleteProductViewsByProductId(context context.Context, productId string) er
 	return nil
 }
 
-func GetUsersListPaginatedValue(itemsPerPage, offset int) (*sql.Rows, error) {
+func GetUsersListPaginatedValue(context context.Context, itemsPerPage, offset int) (*sql.Rows, error) {
 	query := `SELECT id, title, views, price FROM products ORDER BY id LIMIT $1 OFFSET $2`
-	return database.Query(query, itemsPerPage, offset)
+	return database.QueryContext(context, query, itemsPerPage, offset)
+}
+
+func GetProductViews(context context.Context, pid string) (*sql.Rows, error) {
+	query := `SELECT COUNT(*) AS total_views FROM product_views WHERE product_id = $1;`
+	return database.Query(query, pid)
 }
 
 func AddProductViews(context context.Context, userId, productId string) error {

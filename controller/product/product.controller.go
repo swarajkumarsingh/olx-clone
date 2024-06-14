@@ -69,7 +69,7 @@ func GetProducts(ctx *gin.Context) {
 	itemsPerPage := getItemPerPageValue(ctx)
 	offset := getOffsetValue(page, itemsPerPage)
 
-	rows, err := model.GetUsersListPaginatedValue(itemsPerPage, offset)
+	rows, err := model.GetUsersListPaginatedValue(context.TODO(), itemsPerPage, offset)
 	if err != nil {
 		logger.WithRequest(ctx).Panicln(messages.FailedToRetrieveProductsMessage)
 	}
@@ -140,4 +140,23 @@ func DeleteProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusNoContent, gin.H{})
+}
+
+// get product views
+func GetProductViews(ctx *gin.Context) {
+	defer errorHandler.Recovery(ctx, http.StatusConflict)
+
+	productId := ctx.Param("pid")
+	views, err := model.GetProductViews(context.TODO(), productId);
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.WithRequest(ctx).Panicln(http.StatusNotFound, messages.ProductNotFoundMessage)
+		}
+		logger.WithRequest(ctx).Panicln(err)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":   false,
+		"views": views,
+	})
 }

@@ -4,3 +4,5 @@ CREATE TABLE product_views (
     user_id INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+

@@ -28,16 +28,43 @@ services:
     volumes:
       - grafana-storage:/var/lib/grafana
 
+    # Pgadmin Image
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    hostname: localhost
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      GUNICORN_ACCESS_LOGFILE: "/dev/null"
+    volumes:
+      - ./pgadmin-servers.json:/pgadmin4/servers.json
+      - ./pgadmin:/var/lib/pgadmin
+    ports:
+      - "3030:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
-    build: ./postgres/.
     container_name: postgres_container
+    image: postgres:13.5
     ports:
       - 5432:5432
     volumes:
-      - db:/data
+      - ./postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    hostname: localhost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: olx_clone
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   golang:
     container_name: golang_container
